@@ -223,7 +223,45 @@ app.get('/api/lesson-progress', (req, res) => {
   }
 });
 
-app.get('/api/admin/users', (req, res) => {
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+function adminAuth(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!decoded.isAdmin) {
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+    req.admin = decoded;
+    next();
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+}
+
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  
+  if (password === ADMIN_PASSWORD) {
+    const token = jwt.sign(
+      { isAdmin: true, name: 'Admin' },
+      JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+    res.json({ token, message: 'Login successful' });
+  } else {
+    res.status(401).json({ error: 'Invalid password' });
+  }
+});
+
+app.get('/api/admin/users', adminAuth, (req, res) => {
   db.all(
     'SELECT * FROM users ORDER BY created_at DESC',
     (err, rows) => {
@@ -340,42 +378,6 @@ app.get('/api/admin/stats', adminAuth, (req, res) => {
   });
 });
 
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+app.listen(PORT, () => {
+  console.log(`Y-SAFE Web server running on http://localhost:${PORT}`);
 });
-
-function adminAuth(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
-    return res.status(401).json({ error: 'No token provided' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    if (!decoded.isAdmin) {
-      return res.status(403).json({ error: 'Not authorized' });
-    }
-    req.admin = decoded;
-    next();
-  } catch (err) {
-    res.status(401).json({ error: 'Invalid token' });
-  }
-}
-
-app.post('/api/admin/login', (req, res) => {
-  const { password } = req.body;
-  
-  if (password === ADMIN_PASSWORD) {
-    const token = jwt.sign(
-      { isAdmin: true, name: 'Admin' },
-      JWT_SECRET,
-      { expiresIn: '1d' }
-    );
-    res.json({ token, message: 'Login successful' });
-  } else {
-    res.status(401).json({ error: 'Invalid password' });
-  }
-});
-
-app.get('/api/admin/users', adminAuth, (req, res) => {
