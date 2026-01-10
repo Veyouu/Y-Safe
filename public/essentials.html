@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>First Aid Essentials - Y-SAFE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <h1 class="site-title-small">Y-SAFE</h1>
+      </div>
+      <button class="btn-back" id="backBtn">← Dashboard</button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <h1 class="page-title">First Aid Essentials</h1>
+      <p class="page-description">Essential items, emergency numbers, and quick references</p>
+
+      <div class="essentials-section">
+        <h2>📞 Emergency Numbers</h2>
+        <div class="emergency-cards">
+          <div class="emergency-card emergency-red">
+            <div class="emergency-icon">🚨</div>
+            <h3>911</h3>
+            <p>Emergency Services</p>
+            <small>Police, Fire, Medical</small>
+          </div>
+          <div class="emergency-card emergency-orange">
+            <div class="emergency-icon">🏥</div>
+            <h3>117</h3>
+            <p>National Emergency</p>
+            <small>Philippines</small>
+          </div>
+          <div class="emergency-card emergency-blue">
+            <div class="emergency-icon">👮</div>
+            <h3>143</h3>
+            <p>PNP Hotline</p>
+            <small>Police Assistance</small>
+          </div>
+          <div class="emergency-card emergency-green">
+            <div class="emergency-icon">🔥</div>
+            <h3>160</h3>
+            <p>Fire Department</p>
+            <small>BFP Hotline</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="essentials-section">
+        <h2>🎒 First Aid Kit Items</h2>
+        <div class="kit-items">
+          <div class="kit-item" data-item="bandages">
+            <div class="kit-icon">🩹</div>
+            <h3>Bandages</h3>
+            <p>Various sizes for covering wounds</p>
+          </div>
+          <div class="kit-item" data-item="antiseptic">
+            <div class="kit-icon">💊</div>
+            <h3>Antiseptic</h3>
+            <p>For cleaning wounds and preventing infection</p>
+          </div>
+          <div class="kit-item" data-item="gauze">
+            <div class="kit-icon">🧻</div>
+            <h3>Gauze Pads</h3>
+            <p>For dressing larger wounds</p>
+          </div>
+          <div class="kit-item" data-item="scissors">
+            <div class="kit-icon">✂️</div>
+            <h3>Scissors</h3>
+            <p>For cutting bandages and dressings</p>
+          </div>
+          <div class="kit-item" data-item="tweezers">
+            <div class="kit-icon">🥢</div>
+            <h3>Tweezers</h3>
+            <p>For removing splinters and debris</p>
+          </div>
+          <div class="kit-item" data-item="gloves">
+            <div class="kit-icon">🧤</div>
+            <h3>Gloves</h3>
+            <p>Disposable gloves for protection</p>
+          </div>
+          <div class="kit-item" data-item="thermometer">
+            <div class="kit-icon">🌡️</div>
+            <h3>Thermometer</h3>
+            <p>For checking body temperature</p>
+          </div>
+          <div class="kit-item" data-item="painkillers">
+            <div class="kit-icon">💊</div>
+            <h3>Pain Relievers</h3>
+            <p>Basic pain relief medication</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="essentials-section">
+        <h2>🎯 Quick Quiz: Match the Tool</h2>
+        <p class="section-description">Test your knowledge by matching first aid tools with their uses!</p>
+        
+        <div class="matching-quiz-container">
+          <div id="matchingQuiz" class="matching-quiz"></div>
+          <button class="btn btn-primary" id="checkMatchingBtn" style="display: none;">Check Answers</button>
+          <div id="matchingResult" class="matching-result" style="display: none;"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/essentials.js"></script>
+</body>
+</html>

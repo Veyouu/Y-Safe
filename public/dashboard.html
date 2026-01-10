@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Y-SAFE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <h1 class="site-title-small">Y-SAFE</h1>
+      </div>
+      <div class="user-info">
+        <span class="user-name" id="userName"></span>
+        <button class="btn-logout" id="logoutBtn">
+          <span class="logout-icon">🚪</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="welcome-section">
+        <h2 id="welcomeMessage"></h2>
+        <p>Choose a topic below to start learning!</p>
+      </div>
+
+      <div class="progress-summary">
+        <div class="progress-card">
+          <div class="progress-icon">📚</div>
+          <div class="progress-info">
+            <span class="progress-number" id="lessonsCompleted">0</span>
+            <span class="progress-label">Lessons Completed</span>
+          </div>
+        </div>
+        <div class="progress-card">
+          <div class="progress-icon">🎯</div>
+          <div class="progress-info">
+            <span class="progress-number" id="quizzesTaken">0</span>
+            <span class="progress-label">Quizzes Taken</span>
+          </div>
+        </div>
+        <div class="progress-card">
+          <div class="progress-icon">⭐</div>
+          <div class="progress-info">
+            <span class="progress-number" id="averageScore">0%</span>
+            <span class="progress-label">Average Score</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" data-page="first-aid">
+          <div class="feature-icon">🏥</div>
+          <h3>Essential First Aid Tutorials</h3>
+          <p>Learn CPR, Burns, Choking, Wounds, Fractures and more!</p>
+          <button class="btn btn-feature">Start Learning →</button>
+        </div>
+
+        <div class="feature-card" data-page="safety">
+          <div class="feature-icon">⚠️</div>
+          <h3>Safety Awareness</h3>
+          <p>Fire safety, Natural Disasters, Road Safety & School Safety</p>
+          <button class="btn btn-feature">Start Learning →</button>
+        </div>
+
+        <div class="feature-card" data-page="essentials">
+          <div class="feature-icon">🎒</div>
+          <h3>First Aid Essentials</h3>
+          <p>Kit items, emergency numbers, quick references</p>
+          <button class="btn btn-feature">Explore →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

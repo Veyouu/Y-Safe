@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>First Aid Tutorials - Y-SAFE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <h1 class="site-title-small">Y-SAFE</h1>
+      </div>
+      <button class="btn-back" id="backBtn">← Dashboard</button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <h1 class="page-title">Essential First Aid Tutorials</h1>
+      <p class="page-description">Master essential first aid skills with our step-by-step guides</p>
+
+      <div class="lessons-grid">
+        <div class="lesson-card" data-lesson="cpr">
+          <div class="lesson-icon">❤️</div>
+          <h3>CPR</h3>
+          <p>Cardiopulmonary Resuscitation - Learn how to save a life</p>
+          <button class="btn btn-lesson">View Lesson</button>
+        </div>
+
+        <div class="lesson-card" data-lesson="burns">
+          <div class="lesson-icon">🔥</div>
+          <h3>Burns</h3>
+          <p>Learn how to treat minor and severe burns</p>
+          <button class="btn btn-lesson">View Lesson</button>
+        </div>
+
+        <div class="lesson-card" data-lesson="choking">
+          <div class="lesson-icon">😰</div>
+          <h3>Choking</h3>
+          <p>Heimlich maneuver and choking response</p>
+          <button class="btn btn-lesson">View Lesson</button>
+        </div>
+
+        <div class="lesson-card" data-lesson="wounds">
+          <div class="lesson-icon">🩹</div>
+          <h3>Wounds</h3>
+          <p>Cleaning and dressing wounds properly</p>
+          <button class="btn btn-lesson">View Lesson</button>
+        </div>
+
+        <div class="lesson-card" data-lesson="fractures">
+          <div class="lesson-icon">🦴</div>
+          <h3>Fractures</h3>
+          <p>Recognizing and treating broken bones</p>
+          <button class="btn btn-lesson">View Lesson</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="lessonModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle"></h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close-btn">Close</button>
+        <button class="btn btn-primary" id="startQuizBtn">Take Quiz</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="quizModal" class="modal">
+    <div class="modal-content quiz-modal">
+      <div class="modal-header">
+        <h2 id="quizTitle">Quiz</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body quiz-body">
+        <div class="quiz-progress">
+          <div class="quiz-progress-bar"></div>
+          <span class="quiz-progress-text">Question <span id="currentQuestion">1</span> of <span id="totalQuestions">5</span></span>
+        </div>
+        <div class="quiz-question" id="quizQuestion"></div>
+        <div class="quiz-options" id="quizOptions"></div>
+      </div>
+      <div class="modal-footer quiz-footer">
+        <button class="btn btn-primary" id="nextQuestionBtn" disabled>Next</button>
+        <button class="btn btn-success" id="submitQuizBtn" style="display: none;">Submit Quiz</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="quizResultModal" class="modal">
+    <div class="modal-content result-modal">
+      <div class="modal-header">
+        <h2>Quiz Complete!</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body result-body">
+        <div class="result-icon">🎉</div>
+        <h3 id="resultScore"></h3>
+        <p id="resultMessage"></p>
+        <div class="result-details">
+          <div class="detail-item">
+            <span>Correct Answers:</span>
+            <span id="correctCount"></span>
+          </div>
+          <div class="detail-item">
+            <span>Total Questions:</span>
+            <span id="totalCount"></span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary modal-close-btn">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/first-aid.js"></script>
+</body>
+</html>
