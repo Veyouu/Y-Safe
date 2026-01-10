@@ -4,6 +4,7 @@
   "description": "Y-SAFE - Essential First Aid & Safety Awareness Website for ELIAS A. SALVADOR NATIONAL HIGH SCHOOL",
   "main": "server.js",
   "scripts": {
+    "postinstall": "npm rebuild sqlite3 || exit 0",
     "start": "node server.js",
     "dev": "node server.js"
   },
