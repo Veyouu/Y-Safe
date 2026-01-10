@@ -1,6 +1,7 @@
 const API_URL = window.location.origin + '/api/admin';
 
 document.addEventListener('DOMContentLoaded', () => {
+  checkAdminAuth();
   setupTabs();
   setupLogout();
   loadStats();
@@ -8,6 +9,32 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSearch();
   setupRefreshButtons();
 });
+
+function checkAdminAuth() {
+  const token = localStorage.getItem('admin-token');
+  
+  if (!token) {
+    window.location.href = 'admin-login.html';
+    return;
+  }
+
+  fetch(`${window.location.origin}/api/admin/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ password: 'check' })
+  })
+  .then(response => {
+    if (!response.ok) {
+      localStorage.removeItem('admin-token');
+      window.location.href = 'admin-login.html';
+    }
+  })
+  .catch(() => {
+  });
+}
 
 function setupTabs() {
   const tabBtns = document.querySelectorAll('.tab-btn');
@@ -32,13 +59,25 @@ function setupTabs() {
 
 function setupLogout() {
   document.getElementById('logoutBtn').addEventListener('click', () => {
-    window.location.href = 'index.html';
+    localStorage.removeItem('admin-token');
+    window.location.href = 'admin-login.html';
   });
 }
 
 async function loadStats() {
+  const token = localStorage.getItem('admin-token');
+  
   try {
-    const response = await fetch(`${API_URL}/stats`);
+    const response = await fetch(`${API_URL}/stats`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Unauthorized');
+    }
+    
     const data = await response.json();
     
     document.getElementById('totalUsers').textContent = data.totalUsers;
@@ -47,18 +86,36 @@ async function loadStats() {
     document.getElementById('averageScore').textContent = `${data.averageScore}%`;
   } catch (error) {
     console.error('Error loading stats:', error);
+    if (error.message === 'Unauthorized') {
+      window.location.href = 'admin-login.html';
+    }
   }
 }
 
 async function loadUsers() {
+  const token = localStorage.getItem('admin-token');
+  
   try {
-    const response = await fetch(`${API_URL}/users`);
+    const response = await fetch(`${API_URL}/users`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Unauthorized');
+    }
+    
     const data = await response.json();
     
     displayUsers(data.users);
   } catch (error) {
     console.error('Error loading users:', error);
-    displayNoData('usersTableBody', 'No users yet');
+    if (error.message === 'Unauthorized') {
+      window.location.href = 'admin-login.html';
+    } else {
+      displayNoData('usersTableBody', 'No users yet');
+    }
   }
 }
 
@@ -88,13 +145,27 @@ function displayUsers(users) {
 }
 
 async function viewUser(userId) {
+  const token = localStorage.getItem('admin-token');
+  
   try {
-    const response = await fetch(`${API_URL}/user/${userId}`);
+    const response = await fetch(`${API_URL}/user/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Unauthorized');
+    }
+    
     const data = await response.json();
     
     displayUserModal(data);
   } catch (error) {
     console.error('Error loading user details:', error);
+    if (error.message === 'Unauthorized') {
+      window.location.href = 'admin-login.html';
+    }
   }
 }
 
@@ -119,14 +190,29 @@ function displayUserModal(data) {
 }
 
 async function loadQuizzes() {
+  const token = localStorage.getItem('admin-token');
+  
   try {
-    const response = await fetch(`${API_URL}/quizzes`);
+    const response = await fetch(`${API_URL}/quizzes`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Unauthorized');
+    }
+    
     const data = await response.json();
     
     displayQuizzes(data.quizzes);
   } catch (error) {
     console.error('Error loading quizzes:', error);
-    displayNoData('quizzesTableBody', 'No quiz results yet');
+    if (error.message === 'Unauthorized') {
+      window.location.href = 'admin-login.html';
+    } else {
+      displayNoData('quizzesTableBody', 'No quiz results yet');
+    }
   }
 }
 
@@ -161,14 +247,29 @@ function displayQuizzes(quizzes) {
 }
 
 async function loadLessons() {
+  const token = localStorage.getItem('admin-token');
+  
   try {
-    const response = await fetch(`${API_URL}/lessons`);
+    const response = await fetch(`${API_URL}/lessons`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Unauthorized');
+    }
+    
     const data = await response.json();
     
     displayLessons(data.lessons);
   } catch (error) {
     console.error('Error loading lessons:', error);
-    displayNoData('lessonsTableBody', 'No lesson progress yet');
+    if (error.message === 'Unauthorized') {
+      window.location.href = 'admin-login.html';
+    } else {
+      displayNoData('lessonsTableBody', 'No lesson progress yet');
+    }
   }
 }
 

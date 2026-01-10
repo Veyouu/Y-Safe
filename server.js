@@ -9,6 +9,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'y-safe-secret-key-2026';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const DATABASE_PATH = process.env.DATABASE_PATH || './database.sqlite';
 
 app.use(cors());
@@ -234,7 +235,7 @@ app.get('/api/admin/users', (req, res) => {
   );
 });
 
-app.get('/api/admin/quizzes', (req, res) => {
+app.get('/api/admin/quizzes', adminAuth, (req, res) => {
   db.all(
     `SELECT qp.*, u.name as user_name, u.section 
      FROM quiz_progress qp 
@@ -249,7 +250,7 @@ app.get('/api/admin/quizzes', (req, res) => {
   );
 });
 
-app.get('/api/admin/lessons', (req, res) => {
+app.get('/api/admin/lessons', adminAuth, (req, res) => {
   db.all(
     `SELECT lp.*, u.name as user_name, u.section 
      FROM lesson_progress lp 
@@ -264,7 +265,7 @@ app.get('/api/admin/lessons', (req, res) => {
   );
 });
 
-app.get('/api/admin/user/:id', (req, res) => {
+app.get('/api/admin/user/:id', adminAuth, (req, res) => {
   const userId = req.params.id;
   
   db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user) => {
@@ -304,7 +305,7 @@ app.get('/api/admin/user/:id', (req, res) => {
   });
 });
 
-app.get('/api/admin/stats', (req, res) => {
+app.get('/api/admin/stats', adminAuth, (req, res) => {
   db.get('SELECT COUNT(*) as count FROM users', (err, usersResult) => {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
@@ -343,6 +344,38 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
-  console.log(`Y-SAFE Web server running on http://localhost:${PORT}`);
+function adminAuth(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!decoded.isAdmin) {
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+    req.admin = decoded;
+    next();
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+}
+
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  
+  if (password === ADMIN_PASSWORD) {
+    const token = jwt.sign(
+      { isAdmin: true, name: 'Admin' },
+      JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+    res.json({ token, message: 'Login successful' });
+  } else {
+    res.status(401).json({ error: 'Invalid password' });
+  }
 });
+
+app.get('/api/admin/users', adminAuth, (req, res) => {
