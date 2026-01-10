@@ -241,6 +241,28 @@ body {
   color: var(--background-white);
 }
 
+.btn-admin {
+  background: var(--soft-green);
+  color: var(--safety-green);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-admin:hover {
+  background: var(--safety-green);
+  color: var(--background-white);
+  transform: translateY(-2px);
+}
+
 .header {
   background: var(--header-blue);
   color: var(--background-white);

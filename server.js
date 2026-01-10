@@ -7,18 +7,19 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
-const JWT_SECRET = 'y-safe-secret-key-2026';
+const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || 'y-safe-secret-key-2026';
+const DATABASE_PATH = process.env.DATABASE_PATH || './database.sqlite';
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-const db = new sqlite3.Database('./database.sqlite', (err) => {
+const db = new sqlite3.Database(DATABASE_PATH, (err) => {
   if (err) {
     console.error('Database connection error:', err);
   } else {
-    console.log('Connected to SQLite database');
+    console.log('Connected to SQLite database at:', DATABASE_PATH);
     initializeDatabase();
   }
 });
@@ -219,6 +220,127 @@ app.get('/api/lesson-progress', (req, res) => {
   } catch (err) {
     res.status(401).json({ error: 'Invalid token' });
   }
+});
+
+app.get('/api/admin/users', (req, res) => {
+  db.all(
+    'SELECT * FROM users ORDER BY created_at DESC',
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      res.json({ users: rows });
+    }
+  );
+});
+
+app.get('/api/admin/quizzes', (req, res) => {
+  db.all(
+    `SELECT qp.*, u.name as user_name, u.section 
+     FROM quiz_progress qp 
+     JOIN users u ON qp.user_id = u.id 
+     ORDER BY qp.completed_at DESC`,
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      res.json({ quizzes: rows });
+    }
+  );
+});
+
+app.get('/api/admin/lessons', (req, res) => {
+  db.all(
+    `SELECT lp.*, u.name as user_name, u.section 
+     FROM lesson_progress lp 
+     JOIN users u ON lp.user_id = u.id 
+     ORDER BY lp.completed_at DESC`,
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      res.json({ lessons: rows });
+    }
+  );
+});
+
+app.get('/api/admin/user/:id', (req, res) => {
+  const userId = req.params.id;
+  
+  db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    db.all(
+      'SELECT * FROM quiz_progress WHERE user_id = ? ORDER BY completed_at DESC',
+      [userId],
+      (err, quizzes) => {
+        if (err) {
+          return res.status(500).json({ error: 'Database error' });
+        }
+
+        db.all(
+          'SELECT * FROM lesson_progress WHERE user_id = ? ORDER BY completed_at DESC',
+          [userId],
+          (err, lessons) => {
+            if (err) {
+              return res.status(500).json({ error: 'Database error' });
+            }
+
+            res.json({
+              user,
+              quizzes,
+              lessons
+            });
+          }
+        );
+      }
+    );
+  });
+});
+
+app.get('/api/admin/stats', (req, res) => {
+  db.get('SELECT COUNT(*) as count FROM users', (err, usersResult) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    db.get('SELECT COUNT(*) as count FROM quiz_progress', (err, quizzesResult) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+
+      db.get('SELECT COUNT(*) as count FROM lesson_progress', (err, lessonsResult) => {
+        if (err) {
+          return res.status(500).json({ error: 'Database error' });
+        }
+
+        db.get('SELECT AVG(CAST(score AS FLOAT) / CAST(total_questions AS FLOAT)) * 100 as avg FROM quiz_progress', (err, scoreResult) => {
+          if (err) {
+            return res.status(500).json({ error: 'Database error' });
+          }
+
+          const avgScore = scoreResult.avg ? Math.round(scoreResult.avg) : 0;
+
+          res.json({
+            totalUsers: usersResult.count,
+            totalQuizzes: quizzesResult.count,
+            totalLessons: lessonsResult.count,
+            averageScore: avgScore
+          });
+        });
+      });
+    });
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 app.listen(PORT, () => {
