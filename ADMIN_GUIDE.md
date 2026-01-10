@@ -2,18 +2,21 @@
 
 ## For Client: How to Monitor Users & Progress
 
-### Accessing the Admin Dashboard
+### Accessing Admin Dashboard
 
-Your client can access the admin dashboard from their phone or any device:
+Your client can access admin dashboard from their phone or any device:
 
-1. **Open the Y-SAFE website** (your deployed URL)
+1. **Open Y-SAFE website** (your deployed URL)
    - Example: `https://your-app.onrender.com`
 
 2. **Click on "Admin" button** in the top-right corner
    - It appears next to the logout button on the dashboard
 
-3. **OR** access directly at:
-   - `https://your-app.onrender.com/admin.html`
+3. **Enter admin password** (set by developer)
+   - Default: `admin123` (change this in production!)
+
+4. **OR** access directly at:
+   - `https://your-app.onrender.com/admin-login.html`
 
 ### What the Admin Dashboard Shows
 
@@ -59,10 +62,32 @@ When you click "View" on a user:
 - **Color-coded scores** - Easy to identify performance levels
 
 ### Security Note
-Currently, the admin panel is accessible to anyone who knows the URL. For production, you should add password protection.
+The admin panel is now **password protected**. Only users with the correct password can access the dashboard.
 
-### To Add Password Protection:
-Contact your developer to add authentication to the admin panel.
+### Changing Admin Password
+
+**In Render/Railway Environment Variables:**
+1. Go to your web service settings
+2. Find "Environment Variables"
+3. Add or update:
+   ```
+   Key: ADMIN_PASSWORD
+   Value: your-secure-password-here
+   ```
+4. Save and redeploy
+
+**For Developer (Locally):**
+Add to your `.env` file:
+```
+ADMIN_PASSWORD=your-secure-password-here
+```
+
+**Default Password:** `admin123` (⚠️ Change this immediately!)
+
+### Session Timeout
+- Admin sessions last **1 day**
+- After timeout, you'll need to login again
+- Tokens are stored in browser localStorage
 
 ### Exporting Data
 To export data for reports:
@@ -78,6 +103,31 @@ To export data for reports:
 
 ---
 
-**Access it now:** `https://your-app.onrender.com/admin.html`
+**Access it now:** `https://your-app.onrender.com/admin-login.html`
 
 For technical support or custom features, contact the developer.
+
+---
+
+## Developer Setup Guide
+
+### Environment Variables Needed
+
+Add these to your hosting platform (Render/Railway):
+
+```
+JWT_SECRET=your-jwt-secret-key-here
+ADMIN_PASSWORD=your-admin-password-here
+DATABASE_PATH=/var/data/database.sqlite
+```
+
+### How to Generate JWT_SECRET:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+### Important Security Notes:
+1. **Never commit ADMIN_PASSWORD to GitHub**
+2. **Use strong passwords** (minimum 12 characters)
+3. **Change default password immediately**
+4. **Use different JWT_SECRET for production**
