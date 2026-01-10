@@ -19,6 +19,8 @@ app.use(express.static('public'));
 const db = new sqlite3.Database(DATABASE_PATH, (err) => {
   if (err) {
     console.error('Database connection error:', err);
+    console.error('Database path:', DATABASE_PATH);
+    process.exit(1);
   } else {
     console.log('Connected to SQLite database at:', DATABASE_PATH);
     initializeDatabase();
