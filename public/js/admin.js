@@ -17,23 +17,6 @@ function checkAdminAuth() {
     window.location.href = 'admin-login.html';
     return;
   }
-
-  fetch(`${window.location.origin}/api/admin/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ password: 'check' })
-  })
-  .then(response => {
-    if (!response.ok) {
-      localStorage.removeItem('admin-token');
-      window.location.href = 'admin-login.html';
-    }
-  })
-  .catch(() => {
-  });
 }
 
 function setupTabs() {
