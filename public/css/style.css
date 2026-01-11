@@ -84,12 +84,16 @@ body::before {
 }
 
 .logo-image {
-  width: 120px;
+  width: 180px;
   height: auto;
   margin-bottom: 15px;
   animation: bounce 2s infinite;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
   transition: transform 0.3s ease;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: auto;
+  image-rendering: high-quality;
 }
 
 .logo-image:hover {
@@ -331,11 +335,15 @@ body::before {
 }
 
 .logo-image-small {
-  width: 50px;
+  width: 60px;
   height: auto;
   margin-right: 8px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   transition: transform 0.3s ease;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: auto;
+  image-rendering: high-quality;
 }
 
 .logo-image-small:hover {
