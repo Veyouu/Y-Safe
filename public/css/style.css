@@ -94,6 +94,8 @@ body::before {
   image-rendering: crisp-edges;
   image-rendering: auto;
   image-rendering: high-quality;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .logo-image:hover {
@@ -344,6 +346,8 @@ body::before {
   image-rendering: crisp-edges;
   image-rendering: auto;
   image-rendering: high-quality;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .logo-image-small:hover {
