@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = window.location.origin + '/api';
 
 const lessons = {
   cpr: {
@@ -371,7 +371,7 @@ const lessons = {
       },
       {
         question: 'Should you try to realign a broken bone?',
-        options: ['Yes, gently', 'No, never', 'Only if it's a minor break', 'Ask the person to do it'],
+        options: ['Yes, gently', 'No, never', 'Only if it\'s a minor break', 'Ask the person to do it'],
         correct: 1
       },
       {
