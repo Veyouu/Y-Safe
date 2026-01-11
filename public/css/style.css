@@ -27,6 +27,18 @@ body {
   color: var(--primary-text);
   line-height: 1.6;
   min-height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: -1;
 }
 
 .container {
@@ -42,6 +54,17 @@ body {
   justify-content: center;
   background: url(../images/BG1.png) center center / cover no-repeat;
   padding: 20px;
+  position: relative;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(21, 101, 192, 0.4);
 }
 
 .login-card {
@@ -66,6 +89,11 @@ body {
   margin-bottom: 15px;
   animation: bounce 2s infinite;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+  transition: transform 0.3s ease;
+}
+
+.logo-image:hover {
+  transform: scale(1.05);
 }
 
 .logo-icon {
@@ -307,6 +335,11 @@ body {
   height: auto;
   margin-right: 8px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  transition: transform 0.3s ease;
+}
+
+.logo-image-small:hover {
+  transform: scale(1.1);
 }
 
 .site-title-small {
@@ -354,11 +387,12 @@ body {
 }
 
 .progress-card {
-  background: var(--background-white);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 24px;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
@@ -449,11 +483,12 @@ body {
 }
 
 .lesson-card {
-  background: var(--background-white);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 28px;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
 }
