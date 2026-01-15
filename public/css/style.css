@@ -87,6 +87,7 @@ body::before {
   width: 180px;
   height: auto;
   margin-bottom: 15px;
+  border-radius: 20px;
   animation: bounce 2s infinite;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
   transition: transform 0.3s ease;
@@ -94,8 +95,6 @@ body::before {
   image-rendering: crisp-edges;
   image-rendering: auto;
   image-rendering: high-quality;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .logo-image:hover {
@@ -153,6 +152,46 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.maintenance-notice {
+  text-align: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #FFF3E0 0%, #FFECB3 100%);
+  border-radius: 15px;
+  border: 2px solid var(--warning-yellow);
+  margin-bottom: 20px;
+}
+
+.notice-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.maintenance-notice h3 {
+  color: var(--warning-yellow);
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.maintenance-notice p {
+  color: var(--secondary-text);
+  font-size: 16px;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.maintenance-time {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(251, 192, 45, 0.3);
+}
+
+.maintenance-time p {
+  font-size: 14px;
+  color: var(--warning-yellow);
+  font-weight: 500;
 }
 
 .form-group {
@@ -346,8 +385,6 @@ body::before {
   image-rendering: crisp-edges;
   image-rendering: auto;
   image-rendering: high-quality;
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.15);
 }
 
 .logo-image-small:hover {
@@ -527,6 +564,93 @@ body::before {
   margin-bottom: 16px;
 }
 
+.lesson-card.completed {
+  background: linear-gradient(135deg, rgba(67, 160, 71, 0.1), rgba(255, 255, 255, 0.95));
+  border: 2px solid var(--safety-green);
+  position: relative;
+}
+
+.lesson-card.completed::after {
+  content: '✓';
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: var(--safety-green);
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.quiz-section {
+  margin-top: 40px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.quiz-container h3 {
+  color: var(--header-blue);
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.quiz-container p {
+  color: var(--secondary-text);
+  margin-bottom: 20px;
+}
+
+.quiz-btn {
+  padding: 12px 30px;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.quiz-btn:disabled {
+  background: var(--secondary-text);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.quiz-progress {
+  font-size: 14px;
+  color: var(--primary-text);
+}
+
+.safety-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.section-title {
+  color: var(--header-blue);
+  font-size: 28px;
+  margin-bottom: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: var(--safety-green);
+  border-radius: 2px;
+}
+
 .modal {
   display: none;
   position: fixed;
@@ -610,6 +734,11 @@ body::before {
 
 .modal-body li {
   margin-bottom: 8px;
+}
+
+.lesson-image {
+  text-align: center;
+  margin: 20px 0;
 }
 
 .modal-footer {
