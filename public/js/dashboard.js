@@ -24,14 +24,32 @@ function setupTutorial() {
 }
 
 function loadDashboard() {
-  // Set default welcome message
-  document.getElementById('userName').textContent = 'Guest';
-  document.getElementById('welcomeMessage').textContent = 'Welcome to Y-SAFE!';
-  
-  // Set default progress to 0
-  document.getElementById('lessonsCompleted').textContent = '0';
-  document.getElementById('quizzesTaken').textContent = '0';
-  document.getElementById('averageScore').textContent = '0%';
+  const token = localStorage.getItem('y-safe-token');
+  if (!token) {
+    document.getElementById('userName').textContent = 'Guest';
+    document.getElementById('welcomeMessage').textContent = 'Welcome to Y-SAFE!';
+    document.getElementById('lessonsCompleted').textContent = '0';
+    document.getElementById('quizzesTaken').textContent = '0';
+    document.getElementById('averageScore').textContent = '0%';
+    return;
+  }
+  fetch(`${API_URL}/user`, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    document.getElementById('userName').textContent = data.user.name;
+    document.getElementById('welcomeMessage').textContent = `Welcome, ${data.user.name}!`;
+    fetchProgress(token);
+  })
+  .catch(error => {
+    console.error('Error fetching user data:', error);
+    localStorage.removeItem('y-safe-token');
+    localStorage.removeItem('y-safe-user');
+    window.location.href = 'index.html';
+  });
 }
 
 function fetchProgress(token) {

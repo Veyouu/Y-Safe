@@ -42,8 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(response => response.json())
     .then(data => {
       if (data.token) {
-        localStorage.setItem('user-token', data.token);
-        localStorage.setItem('user-info', JSON.stringify(data.user));
+        localStorage.setItem('y-safe-token', data.token);
+        localStorage.setItem('y-safe-user', JSON.stringify(data.user));
         window.location.href = 'dashboard.html';
       } else {
         throw new Error(data.error || 'Registration failed');
@@ -58,6 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function handleGuestLogin() {
+    const name = document.getElementById('userName').value.trim();
+    const section = document.getElementById('userSection').value.trim();
     guestBtn.textContent = 'Loading...';
     guestBtn.disabled = true;
 
@@ -67,16 +69,16 @@ document.addEventListener('DOMContentLoaded', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
-        name: 'Guest', 
-        section: '', 
+        name: name || 'Guest', 
+        section,
         isGuest: true 
       })
     })
     .then(response => response.json())
     .then(data => {
       if (data.token) {
-        localStorage.setItem('user-token', data.token);
-        localStorage.setItem('user-info', JSON.stringify(data.user));
+        localStorage.setItem('y-safe-token', data.token);
+        localStorage.setItem('y-safe-user', JSON.stringify(data.user));
         window.location.href = 'dashboard.html';
       } else {
         throw new Error(data.error || 'Guest login failed');
