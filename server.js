@@ -249,7 +249,6 @@ app.post('/api/lesson-progress', requireAuth, (req, res) => {
     res.json({ success: true, message: 'Lesson progress saved' });
   });
 });
-});
 
 app.get('/api/lesson-progress', requireAuth, (req, res) => {
   const userId = req.user.userId;
