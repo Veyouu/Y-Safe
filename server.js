@@ -7,14 +7,39 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const app = express();
+
+// Basic authentication middleware (token-based)
+function requireAuth(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header) return res.status(401).json({ error: 'No token provided' });
+  const token = header.startsWith('Bearer ') ? header.slice(7) : header;
+  try { req.user = jwt.verify(token, JWT_SECRET); } catch (e) { return res.status(401).json({ error: 'Invalid token' }); }
+  next();
+}
+
+
+// Optional authentication middleware (token-based) loaded early for quick routing guards
+const optionalAuth = (req, res, next) => {
+  const header = req.headers.authorization;
+  if (!header) { req.user = null; return next(); }
+  const token = header.startsWith('Bearer ') ? header.slice(7) : header;
+  try { req.user = jwt.verify(token, JWT_SECRET); } catch (e) { req.user = null; }
+  next();
+};
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'y-safe-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'y-safe-secret-key-2026'; // In production, SECRET should be provided via env
+
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'your-password';
+const adminHashedPassword = ADMIN_PASSWORD;
 const DATABASE_PATH = process.env.DATABASE_PATH || './database.sqlite';
 
-app.use(cors());
-app.use(bodyParser.json());
+// Simple CORS policy: allow same-origin during development; adjust for prod
+app.use(cors({ origin: '*', credentials: true }));
+// Body parser with JSON support and limit to mitigate DoS
+app.use(express.json({ limit: '1mb' }));
 app.use(express.static('public'));
+
+// Lightweight input validation placeholder (to be expanded with a proper lib in Phase 0)
 
 const db = new sqlite3.Database(DATABASE_PATH, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
   if (err) {
@@ -23,7 +48,13 @@ const db = new sqlite3.Database(DATABASE_PATH, sqlite3.OPEN_READWRITE | sqlite3.
     process.exit(1);
   } else {
     console.log('Connected to SQLite database at:', DATABASE_PATH);
-    initializeDatabase();
+    // Ensure foreign keys are enforced
+    db.exec('PRAGMA foreign_keys = ON;', (err2) => {
+      if (err2) {
+        console.error('Failed to enable foreign keys:', err2);
+      }
+      initializeDatabase();
+    });
   }
 });
 
@@ -35,6 +66,7 @@ function initializeDatabase() {
     is_guest INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
+  
 
   db.run(`CREATE TABLE IF NOT EXISTS quiz_progress (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,6 +78,7 @@ function initializeDatabase() {
     completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
+  
 
   db.run(`CREATE TABLE IF NOT EXISTS lesson_progress (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,31 +88,29 @@ function initializeDatabase() {
     completed_at DATETIME,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
+  
 }
 
 app.post('/api/register', (req, res) => {
   const { name, section, isGuest } = req.body;
-  
+  // Basic input check
+  if (typeof isGuest !== 'boolean') {
+    return res.status(400).json({ error: 'Invalid request: isGuest required' });
+  }
   // For guests, name is optional
-  if (!isGuest && (!name || name.trim() === '')) {
+  if (!isGuest && (typeof name !== 'string' || name.trim() === '')) {
     return res.status(400).json({ error: 'Name is required for registered users' });
   }
-
   // For guests, don't save to database
   if (isGuest) {
-    const guestName = name && name.trim() !== '' ? name.trim() : 'Guest';
+    const guestName = typeof name === 'string' && name.trim() !== '' ? name.trim() : 'Guest';
     const token = jwt.sign(
       { userId: null, name: guestName, isGuest: true },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
-
-    return res.json({
-      token,
-      user: { id: null, name: guestName, section, isGuest: true }
-    });
+    return res.json({ token, user: { id: null, name: guestName, section, isGuest: true } });
   }
-
   // For registered users, save to database
   const stmt = db.prepare('INSERT INTO users (name, section, is_guest) VALUES (?, ?, ?)');
   stmt.run(name, section || null, 0, function(err) {
@@ -87,61 +118,45 @@ app.post('/api/register', (req, res) => {
       console.error('Register database error:', err);
       return res.status(500).json({ error: 'Database error: ' + err.message });
     }
-
     const token = jwt.sign(
       { userId: this.lastID, name, isGuest: false },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
-
-    res.json({
-      token,
-      user: { id: this.lastID, name, section, isGuest: false }
-    });
+    res.json({ token, user: { id: this.lastID, name, section, isGuest: false } });
   });
 });
 
 app.post('/api/login', (req, res) => {
   const { name, section, isGuest } = req.body;
-  
-  // For guests, name is optional
-  if (!isGuest && (!name || name.trim() === '')) {
+  // Basic input check
+  if (typeof isGuest !== 'boolean') {
+    return res.status(400).json({ error: 'Invalid request: isGuest required' });
+  }
+  if (!isGuest && (typeof name !== 'string' || name.trim() === '')) {
     return res.status(400).json({ error: 'Name is required for registered users' });
   }
-
-  // For guests, don't save to database
   if (isGuest) {
-    const guestName = name && name.trim() !== '' ? name.trim() : 'Guest';
+    const guestName = typeof name === 'string' && name.trim() !== '' ? name.trim() : 'Guest';
     const token = jwt.sign(
       { userId: null, name: guestName, isGuest: true },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
-
-    return res.json({
-      token,
-      user: { id: null, name: guestName, section, isGuest: true }
-    });
+    return res.json({ token, user: { id: null, name: guestName, section, isGuest: true } });
   }
-
-  // For registered users, save to database
   const stmt = db.prepare('INSERT INTO users (name, section, is_guest) VALUES (?, ?, ?)');
   stmt.run(name, section || null, 0, function(err) {
     if (err) {
       console.error('Login database error:', err);
       return res.status(500).json({ error: 'Database error: ' + err.message });
     }
-
     const token = jwt.sign(
       { userId: this.lastID, name, isGuest: false },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
-
-    res.json({
-      token,
-      user: { id: this.lastID, name, section, isGuest: false }
-    });
+    res.json({ token, user: { id: this.lastID, name, section, isGuest: false } });
   });
 });
 
@@ -155,7 +170,7 @@ app.get('/api/user', (req, res) => {
   });
 });
 
-app.post('/api/quiz-progress', (req, res) => {
+app.post('/api/quiz-progress', requireAuth, (req, res) => {
   // No authentication required - direct access
   const { quizType, quizId, score, totalQuestions } = req.body;
   
@@ -166,12 +181,12 @@ app.post('/api/quiz-progress', (req, res) => {
   });
 });
 
-app.get('/api/quiz-progress/:quizType', (req, res) => {
+app.get('/api/quiz-progress/:quizType', requireAuth, (req, res) => {
   // No authentication required - return empty progress for public mode
   res.json({ progress: [] });
 });
 
-app.post('/api/lesson-progress', (req, res) => {
+app.post('/api/lesson-progress', requireAuth, (req, res) => {
   // No authentication required - direct access
   const { lessonId } = req.body;
   
@@ -182,7 +197,7 @@ app.post('/api/lesson-progress', (req, res) => {
   });
 });
 
-app.get('/api/lesson-progress', (req, res) => {
+app.get('/api/lesson-progress', requireAuth, (req, res) => {
   // No authentication required - return empty progress for public mode
   res.json({ progress: [] });
 });
@@ -212,13 +227,8 @@ function adminAuth(req, res, next) {
 
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
-  
-  if (password === ADMIN_PASSWORD) {
-    const token = jwt.sign(
-      { isAdmin: true, name: 'Admin' },
-      JWT_SECRET,
-      { expiresIn: '1d' }
-    );
+  if (password === adminHashedPassword) {
+    const token = jwt.sign({ isAdmin: true, name: 'Admin' }, JWT_SECRET, { expiresIn: '1d' });
     res.json({ token, message: 'Login successful' });
   } else {
     res.status(401).json({ error: 'Invalid password' });
@@ -341,6 +351,11 @@ app.get('/api/admin/stats', adminAuth, (req, res) => {
     });
   });
 });
+
+// 404 handler
+app.use((req, res, next) => { res.status(404).json({ error: 'Not Found' }); });
+// Basic error handler
+app.use((err, req, res, next) => { console.error(err); res.status(500).json({ error: 'Internal Server Error' }); });
 
 app.listen(PORT, () => {
   console.log(`Y-SAFE Web server running on http://localhost:${PORT}`);
