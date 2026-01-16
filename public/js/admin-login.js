@@ -2,7 +2,7 @@ const API_URL = window.location.origin + '/api/admin';
 
 document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
 document.getElementById('backBtn').addEventListener('click', () => {
-  window.location.href = 'index.html';
+  window.location.href = 'dashboard.html';
 });
 
 function handleAdminLogin(e) {

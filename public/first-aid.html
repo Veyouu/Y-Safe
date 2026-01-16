@@ -22,43 +22,75 @@
 
   <main class="main-content">
     <div class="container">
-      <h1 class="page-title">Essential First Aid Tutorials</h1>
-      <p class="page-description">Master essential first aid skills with our step-by-step guides</p>
+      <h1 class="page-title">First Aid Tutorial</h1>
+      <p class="page-description">First aid is the immediate care given to a person who is injured or suddenly ill before professional medical help arrives. Knowing basic first aid skills can help prevent injuries from getting worse, reduce pain, and even save lives. This tutorial will guide you through essential first aid techniques using a triangular bandage, including its parts, proper folds, and correct knot tying. You will also learn how to manage common injuries such as wounds on the head and forearm, burns on the hand, proper use of an arm sling, and care for burns on the face or back of the head. By learning these basic skills, you become more prepared to respond calmly and confidently in emergency situations.</p>
 
       <div class="lessons-grid">
-        <div class="lesson-card" data-lesson="cpr">
-          <div class="lesson-icon">❤️</div>
-          <h3>CPR</h3>
-          <p>Cardiopulmonary Resuscitation - Learn how to save a life</p>
+        <div class="lesson-card" data-lesson="bandage-parts">
+          <div class="lesson-icon">📐</div>
+          <h3>Parts of Triangular Bandage</h3>
+          <p>Learn the different parts of a triangular bandage</p>
           <button class="btn btn-lesson">View Lesson</button>
         </div>
 
-        <div class="lesson-card" data-lesson="burns">
+        <div class="lesson-card" data-lesson="bandage-folds">
+          <div class="lesson-icon">📋</div>
+          <h3>Triangular Bandage Folds</h3>
+          <p>Master the different folding techniques</p>
+          <button class="btn btn-lesson">View Lesson</button>
+        </div>
+
+        <div class="lesson-card" data-lesson="square-knot">
+          <div class="lesson-icon">🔗</div>
+          <h3>Square Knot</h3>
+          <p>Learn how to tie a proper square knot</p>
+          <button class="btn btn-lesson">View Lesson</button>
+        </div>
+
+        <div class="lesson-card" data-lesson="head-wound">
+          <div class="lesson-icon">🤕</div>
+          <h3>Wound Top of the Head</h3>
+          <p>Proper bandaging technique for head wounds</p>
+          <button class="btn btn-lesson">View Lesson</button>
+        </div>
+
+        <div class="lesson-card" data-lesson="forearm-wound">
+          <div class="lesson-icon">💪</div>
+          <h3>Wound on the Forearm</h3>
+          <p>How to bandage forearm injuries properly</p>
+          <button class="btn btn-lesson">View Lesson</button>
+        </div>
+
+        <div class="lesson-card" data-lesson="hand-burn">
           <div class="lesson-icon">🔥</div>
-          <h3>Burns</h3>
-          <p>Learn how to treat minor and severe burns</p>
+          <h3>Burn on Hand</h3>
+          <p>Treatment and bandaging for hand burns</p>
           <button class="btn btn-lesson">View Lesson</button>
         </div>
 
-        <div class="lesson-card" data-lesson="choking">
-          <div class="lesson-icon">😰</div>
-          <h3>Choking</h3>
-          <p>Heimlich maneuver and choking response</p>
+        <div class="lesson-card" data-lesson="arm-sling">
+          <div class="lesson-icon">🦾</div>
+          <h3>Arm Sling</h3>
+          <p>Proper technique for creating an arm sling</p>
           <button class="btn btn-lesson">View Lesson</button>
         </div>
 
-        <div class="lesson-card" data-lesson="wounds">
-          <div class="lesson-icon">🩹</div>
-          <h3>Wounds</h3>
-          <p>Cleaning and dressing wounds properly</p>
+        <div class="lesson-card" data-lesson="face-burn">
+          <div class="lesson-icon">😷</div>
+          <h3>Burn in the Face and/or Back of the Head</h3>
+          <p>Special care for facial and head burns</p>
           <button class="btn btn-lesson">View Lesson</button>
         </div>
-
-        <div class="lesson-card" data-lesson="fractures">
-          <div class="lesson-icon">🦴</div>
-          <h3>Fractures</h3>
-          <p>Recognizing and treating broken bones</p>
-          <button class="btn btn-lesson">View Lesson</button>
+      </div>
+      
+      <div class="quiz-section">
+        <div class="quiz-container">
+          <h3>First Aid Tutorial Quiz</h3>
+          <p>Complete all topics above to unlock this quiz.</p>
+          <button class="btn btn-primary quiz-btn" id="firstAidQuizBtn" disabled>Start Quiz</button>
+          <div class="quiz-progress">
+            <span id="completedTopics">0</span> / <span id="totalTopics">8</span> topics completed
+          </div>
         </div>
       </div>
     </div>
@@ -73,7 +105,7 @@
       <div class="modal-body" id="modalBody"></div>
       <div class="modal-footer">
         <button class="btn btn-secondary modal-close-btn">Close</button>
-        <button class="btn btn-primary" id="startQuizBtn">Take Quiz</button>
+        <button class="btn btn-success" id="markCompletedBtn">Mark as Completed</button>
       </div>
     </div>
   </div>
@@ -126,6 +158,8 @@
     </div>
   </div>
 
+  <!-- Load YouTube API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script src="js/first-aid.js"></script>
 </body>
 </html>

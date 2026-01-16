@@ -1,59 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Y-SAFE - Essential First Aid & Safety Awareness | ELIAS A. SALVADOR NATIONAL HIGH SCHOOL</title>
-  <meta name="description" content="Learn essential first aid skills and safety awareness. Interactive lessons on CPR, burns, choking, wounds, fractures, fire safety, natural disasters, road safety, and more.">
-  <meta name="keywords" content="first aid, CPR, safety, emergency, medical, school education, Y-SAFE, Elias Salvador National High School">
-  <meta name="author" content="ELIAS A. SALVADOR NATIONAL HIGH SCHOOL">
-  <meta name="robots" content="index, follow">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y-SAFE - Essential First Aid & Safety Awareness | ELIAS A. SALVADOR NATIONAL HIGH SCHOOL</title>
+    <meta name="description" content="Learn essential first aid skills and safety awareness. Interactive lessons on CPR, burns, choking, wounds, fractures, fire safety, natural disasters, road safety, and more.">
+    <meta name="keywords" content="first aid, CPR, safety, emergency, medical, school education, Y-SAFE, Elias Salvador National High School">
+    <meta name="author" content="ELIAS A. SALVADOR NATIONAL HIGH SCHOOL">
+    <meta name="robots" content="index, follow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-  <div id="app">
-    <div class="login-container">
-      <div class="login-card">
-        <div class="logo-section">
-          <img src="images/LOGO.png?v=2" alt="Y-SAFE Logo" class="logo-image">
-          <h1 class="site-title">Y-SAFE</h1>
-          <p class="site-subtitle">Essential First Aid & Safety Awareness</p>
-          <p class="school-name">ELIAS A. SALVADOR NATIONAL HIGH SCHOOL</p>
-        </div>
 
-        <div class="welcome-message">
-          <h2>Welcome to Y-SAFE!</h2>
-          <p>We're glad you're here. This website is designed to help you learn simple first aid skills, understand safety awareness, and feel more confident in handling emergency situations.</p>
-        </div>
+    <div id="app">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="logo-section">
+                    <img src="images/LOGO.png?v=2" alt="Y-SAFE Logo" class="logo-image">
+                    <h1 class="site-title">Y-SAFE</h1>
+                    <p class="site-subtitle">Essential First Aid & Safety Awareness</p>
+                    <p class="school-name">ELIAS A. SALVADOR NATIONAL HIGH SCHOOL</p>
+                </div>
 
-        <form id="loginForm" class="login-form">
-          <div class="form-group">
-            <label for="name">Your Name *</label>
-            <input type="text" id="name" name="name" placeholder="Enter your name" required>
-            <span class="error-message" id="nameError"></span>
-          </div>
+                <div class="welcome-message">
+                    <h2>Welcome to Y-SAFE!</h2>
+                    <p>We're glad you're here. This website is designed to help you learn simple first aid skills, understand safety awareness, and feel more confident in handling emergency situations.</p>
+                </div>
 
-          <div class="form-group">
-            <label for="section">Section <span class="optional">(optional)</span></label>
-            <input type="text" id="section" name="section" placeholder="Enter your section">
-          </div>
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="name">Your Name *</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                        <span class="error-message" id="nameError"></span>
+                    </div>
 
-          <button type="submit" class="btn btn-primary">
+                    <div class="form-group">
+                        <label for="section">Section <span class="optional">(optional)</span></label>
+                        <input type="text" id="section" name="section" placeholder="Enter your section">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
             <span class="btn-text">Start Learning</span>
             <span class="btn-loader" style="display: none;">Loading...</span>
           </button>
 
-          <button type="button" id="guestBtn" class="btn btn-secondary">
+                    <button type="button" id="guestBtn" class="btn btn-secondary">
             Continue as Guest
           </button>
-        </form>
-      </div>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <script src="js/login.js"></script>
+    <script>
+        // Redirect directly to dashboard
+        window.location.href = 'dashboard.html';
+    </script>
 </body>
+
 </html>
