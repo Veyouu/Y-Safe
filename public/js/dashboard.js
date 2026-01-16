@@ -6,7 +6,24 @@ document.addEventListener('DOMContentLoaded', () => {
   setupAdminLogin();
   setupLogout();
   setupTutorial();
+  setupWelcomeBanner();
 });
+
+function setupWelcomeBanner() {
+  const closeBtn = document.getElementById('closeBanner');
+  const welcomeBanner = document.getElementById('welcomeBanner');
+
+  closeBtn.addEventListener('click', () => {
+    welcomeBanner.style.display = 'none';
+    // Save preference to localStorage
+    localStorage.setItem('y-safe-banner-closed', 'true');
+  });
+
+  // Check if user has already closed banner
+  if (localStorage.getItem('y-safe-banner-closed') === 'true') {
+    welcomeBanner.style.display = 'none';
+  }
+}
 
 function setupTutorial() {
   const closeBtn = document.getElementById('closeTutorial');
@@ -18,8 +35,9 @@ function setupTutorial() {
     localStorage.setItem('y-safe-tutorial-closed', 'true');
   });
 
-  // Check if user has already closed tutorial
-  if (localStorage.getItem('y-safe-tutorial-closed') === 'true') {
+  // Check if user has already closed tutorial - only hide if they have taken quizzes
+  const quizzesTaken = parseInt(document.getElementById('quizzesTaken')?.textContent || '0');
+  if (localStorage.getItem('y-safe-tutorial-closed') === 'true' && quizzesTaken > 0) {
     tutorialSection.style.display = 'none';
   }
 }

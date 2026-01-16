@@ -1602,13 +1602,7 @@ function showResults() {
     syncCompletedTopicsWithDatabase();
 }
 
-    document.getElementById('resultMessage').textContent = message;
-    const resultModal = document.getElementById('quizResultModal');
-    resultModal.classList.add('active');
-    resultModal.style.display = 'flex';
 
-    saveQuizProgress(lessons[currentLesson].title, correctAnswers, total);
-}
 
 function markTopicCompleted() {
     const lessonId = getCurrentLessonId();
@@ -1711,11 +1705,20 @@ function startMainQuiz(lessonType) {
 }
 
 function saveQuizProgress(quizId, score, totalQuestions) {
+    console.log('Saving quiz progress:', { quizId, score, totalQuestions });
+    
+    const token = localStorage.getItem('y-safe-token');
+    if (!token) {
+        console.error('No token found, cannot save quiz progress');
+        alert('Please login to save your quiz progress');
+        return;
+    }
+
     fetch(`${API_URL}/quiz-progress`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('y-safe-token')}`
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
             quizType: 'safety',
@@ -1724,12 +1727,22 @@ function saveQuizProgress(quizId, score, totalQuestions) {
             totalQuestions
         })
     })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            console.log('Quiz progress saved:', data);
+            console.log('Quiz progress saved successfully:', data);
+            if (data.success) {
+                console.log('Quiz saved to database');
+            }
         })
         .catch(error => {
             console.error('Error saving quiz progress:', error);
+            alert('Failed to save quiz progress. Please try again.');
         });
 }
 
