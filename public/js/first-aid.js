@@ -1,7 +1,37 @@
 const API_URL = window.location.origin + '/api';
 
-// Track completed topics
+let currentUserId = null;
 let completedTopics = {};
+
+async function syncCompletedTopicsWithDatabase() {
+  const token = localStorage.getItem('y-safe-token');
+  if (!token) return false;
+  
+  try {
+    const response = await fetch(`${API_URL}/lesson-progress`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) return false;
+    
+    const data = await response.json();
+    const dbProgress = data.progress || {};
+    
+    completedTopics = {};
+    dbProgress.forEach(lesson => {
+      if (lesson.completed) {
+        completedTopics[lesson.lesson_id] = true;
+      }
+    });
+    
+    localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
+    return true;
+  } catch (e) {
+    console.error('Error syncing completed topics:', e);
+    return false;
+  }
+}
+
+// Track completed topics
 try {
   completedTopics = JSON.parse(localStorage.getItem('y-safe-completed-topics') || '{}');
 } catch (e) {
@@ -64,17 +94,21 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     console.log('DOM loaded, setting up first aid page...');
     
-    // Set up modal first
-    setupModal();
+    async function initializePage() {
+      await syncCompletedTopicsWithDatabase();
+      
+      setupModal();
+      
+      setupLessonCards();
+      
+      setupBackButton();
+      updateQuizButton();
+      updateCompletedTopics();
+      
+      console.log('First aid page loaded successfully');
+    }
     
-    // Then set up lesson cards
-    setupLessonCards();
-    
-    setupBackButton();
-    updateQuizButton();
-    updateCompletedTopics();
-    
-    console.log('First aid page loaded successfully');
+    initializePage();
   } catch (error) {
     console.error('Error initializing first aid page:', error);
   }
@@ -525,9 +559,30 @@ function setupModal() {
   });
 }
 
-function markTopicCompleted() {
+async function markTopicCompleted() {
   const lessonId = getCurrentLessonId();
   if (!lessonId || completedTopics[lessonId]) return;
+  
+  const token = localStorage.getItem('y-safe-token');
+  if (token) {
+    try {
+      const response = await fetch(`${API_URL}/lesson-progress`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          lessonId: lessonId,
+          completed: true
+        })
+      });
+      const data = await response.json();
+      console.log('Lesson progress saved:', data);
+    } catch (error) {
+      console.error('Error saving lesson progress:', error);
+    }
+  }
   
   completedTopics[lessonId] = true;
   localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));

@@ -1,7 +1,37 @@
 const API_URL = window.location.origin + '/api';
 
-// Track completed topics
+let currentUserId = null;
 let completedTopics = {};
+
+async function syncCompletedTopicsWithDatabase() {
+  const token = localStorage.getItem('y-safe-token');
+  if (!token) return false;
+  
+  try {
+    const response = await fetch(`${API_URL}/lesson-progress`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) return false;
+    
+    const data = await response.json();
+    const dbProgress = data.progress || {};
+    
+    completedTopics = {};
+    dbProgress.forEach(lesson => {
+      if (lesson.completed) {
+        completedTopics[lesson.lesson_id] = true;
+      }
+    });
+    
+    localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
+    return true;
+  } catch (e) {
+    console.error('Error syncing completed topics:', e);
+    return false;
+  }
+}
+
+// Track completed topics
 try {
   completedTopics = JSON.parse(localStorage.getItem('y-safe-completed-topics') || '{}');
 } catch (e) {
@@ -414,13 +444,18 @@ let correctAnswers = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
   try {
-    // checkAuth() removed - no longer needed
-    setupBackButton();
-    setupEssentialItems();
-    setupModal();
-    updateQuizButton();
-    updateCompletedTopics();
-    console.log('Essentials page loaded successfully');
+    async function initializePage() {
+      await syncCompletedTopicsWithDatabase();
+      
+      setupBackButton();
+      setupEssentialItems();
+      setupModal();
+      updateQuizButton();
+      updateCompletedTopics();
+      console.log('Essentials page loaded successfully');
+    }
+    
+    initializePage();
   } catch (error) {
     console.error('Error initializing essentials page:', error);
   }
@@ -602,9 +637,30 @@ function selectOption(index, element) {
   document.getElementById('nextQuestionBtn').disabled = false;
 }
 
-function markTopicCompleted() {
+async function markTopicCompleted() {
   const itemId = getCurrentLessonId();
   if (!itemId || completedTopics[itemId]) return;
+  
+  const token = localStorage.getItem('y-safe-token');
+  if (token) {
+    try {
+      const response = await fetch(`${API_URL}/lesson-progress`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          lessonId: itemId,
+          completed: true
+        })
+      });
+      const data = await response.json();
+      console.log('Lesson progress saved:', data);
+    } catch (error) {
+      console.error('Error saving lesson progress:', error);
+    }
+  }
   
   completedTopics[itemId] = true;
   localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));

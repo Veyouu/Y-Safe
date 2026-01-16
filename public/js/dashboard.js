@@ -139,6 +139,7 @@ function setupLogout() {
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('y-safe-token');
       localStorage.removeItem('y-safe-user');
+      localStorage.removeItem('y-safe-completed-topics');
       window.location.href = 'index.html';
     });
   }

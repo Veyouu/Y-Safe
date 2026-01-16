@@ -1,13 +1,63 @@
 const API_URL = window.location.origin + '/api';
 
-// Track completed topics
+let currentUserId = null;
 let completedTopics = {};
+
+async function syncCompletedTopicsWithDatabase() {
+  const token = localStorage.getItem('y-safe-token');
+  if (!token) return false;
+  
+  try {
+    const response = await fetch(`${API_URL}/lesson-progress`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) return false;
+    
+    const data = await response.json();
+    const dbProgress = data.progress || {};
+    
+    completedTopics = {};
+    dbProgress.forEach(lesson => {
+      if (lesson.completed) {
+        completedTopics[lesson.lesson_id] = true;
+      }
+    });
+    
+    localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
+    return true;
+  } catch (e) {
+    console.error('Error syncing completed topics:', e);
+    return false;
+  }
+}
+
+// Track completed topics
 try {
     completedTopics = JSON.parse(localStorage.getItem('y-safe-completed-topics') || '{}');
 } catch (e) {
     console.error('Error loading completed topics:', e);
     completedTopics = {};
 }
+
+// Get current user ID from token
+async function getCurrentUserId() {
+  const token = localStorage.getItem('y-safe-token');
+  if (!token) return null;
+  
+  try {
+    const response = await fetch(`${API_URL}/user`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) return null;
+    
+    const data = await response.json();
+    return data.user?.id || null;
+  } catch (e) {
+    console.error('Error getting user:', e);
+    return null;
+  }
+}
+
 
 // Main lesson quiz data
 const mainLessonQuiz = {
@@ -975,6 +1025,8 @@ const lessons = {
 // Test if JavaScript is loading
 console.log('Safety.js loaded successfully');
 
+syncCompletedTopicsWithDatabase();
+
 let currentLesson = null;
 let currentQuiz = [];
 let currentQuestionIndex = 0;
@@ -1075,9 +1127,30 @@ function goToDashboard() {
     window.location.href = 'dashboard.html';
 }
 
-function markTopicCompleted() {
+async function markTopicCompleted() {
     const lessonId = currentLesson;
     if (!lessonId || completedTopics[lessonId]) return;
+
+    const token = localStorage.getItem('y-safe-token');
+    if (token) {
+        try {
+            const response = await fetch(`${API_URL}/lesson-progress`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    lessonId: lessonId,
+                    completed: true
+                })
+            });
+            const data = await response.json();
+            console.log('Lesson progress saved:', data);
+        } catch (error) {
+            console.error('Error saving lesson progress:', error);
+        }
+    }
 
     completedTopics[lessonId] = true;
     localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
@@ -1499,11 +1572,11 @@ function handleNextQuestion() {
 function showResults() {
     const score = Math.round((correctAnswers / currentQuiz.length) * 100);
     const total = currentQuiz.length;
-
+    
     document.getElementById('resultScore').textContent = `${score}%`;
     document.getElementById('correctCount').textContent = correctAnswers;
     document.getElementById('totalCount').textContent = total;
-
+    
     let message = '';
     if (score === 100) {
         message = 'Perfect! You\'re a safety expert!';
@@ -1518,6 +1591,16 @@ function showResults() {
         message = 'Keep practicing! Review the lesson and try again.';
         document.querySelector('.result-icon').textContent = '📚';
     }
+    
+    document.getElementById('resultMessage').textContent = message;
+    const resultModal = document.getElementById('quizResultModal');
+    resultModal.classList.add('active');
+    resultModal.style.display = 'flex';
+    
+    saveQuizProgress(lessons[currentLesson].title, correctAnswers, total);
+    markTopicCompleted();
+    syncCompletedTopicsWithDatabase();
+}
 
     document.getElementById('resultMessage').textContent = message;
     const resultModal = document.getElementById('quizResultModal');
@@ -1530,23 +1613,23 @@ function showResults() {
 function markTopicCompleted() {
     const lessonId = getCurrentLessonId();
     if (!lessonId || completedTopics[lessonId]) return;
-
+    
     completedTopics[lessonId] = true;
     localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
-
-    // Update the lesson card
+    
+    // Update lesson card
     updateLessonCard(lessonId, true);
-
+    
     // Update button
     const markBtn = document.getElementById('markCompletedBtn');
     markBtn.textContent = 'Completed';
     markBtn.disabled = true;
     markBtn.classList.add('btn-secondary');
     markBtn.classList.remove('btn-success');
-
+    
     // Update quiz button
     updateQuizButton();
-    updateCompletedTopics();
+    syncCompletedTopicsWithDatabase();
 }
 
 function getCurrentLessonId() {
@@ -1628,19 +1711,19 @@ function startMainQuiz(lessonType) {
 }
 
 function saveQuizProgress(quizId, score, totalQuestions) {
-    // Token no longer needed for API calls
     fetch(`${API_URL}/quiz-progress`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                quizType: 'safety',
-                quizId: quizId.toLowerCase(),
-                score,
-                totalQuestions
-            })
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('y-safe-token')}`
+        },
+        body: JSON.stringify({
+            quizType: 'safety',
+            quizId: quizId.toLowerCase(),
+            score,
+            totalQuestions
         })
+    })
         .then(response => response.json())
         .then(data => {
             console.log('Quiz progress saved:', data);
