@@ -1,0 +1,72 @@
+# How to Fix Login Error Manually
+
+## The Problem:
+The file `first-aid.js` has hardcoded: `http://localhost:3000/api`
+This causes error when deployed (where it should be your Render/Railway URL)
+
+## The Fix:
+Replace `http://localhost:3000/api` with `window.location.origin + '/api'`
+
+## Simple Manual Fix:
+
+### Step 1: Open Your Login File
+1. Go to: `D:\Y-Safe Web\public\js\login.js`
+2. Open with Notepad or any text editor
+3. Find this line (around line 1):
+   ```
+   const API_URL = 'http://localhost:3000/api';
+   ```
+4. Replace it with:
+   ```
+   const API_URL = window.location.origin + '/api';
+   ```
+5. Save the file
+
+### Step 2: Open First Aid File
+1. Go to: `D:\Y-Safe Web\public\js\first-aid.js` or `first-aid-fixed.js`
+2. The file `first-aid-fixed.js` should have the fix but may not exist
+3. If you see `first-aid-fixed.js`, use that
+4. If you only see `first-aid.js`, edit it as described above
+5. Make sure it has: `const API_URL = window.location.origin + '/api';`
+
+### Step 3: Verify
+1. After saving, refresh your browser
+2. Open browser DevTools (F12)
+3. Go to Console tab
+4. Try clicking login
+5. Should work!
+
+### Step 4: Deploy
+1. Delete old deployment on Render/Railway
+2. Create new deployment
+3. Add environment variables:
+   - JWT_SECRET=<your-generated-secret>
+   - ADMIN_PASSWORD=<your-password>
+4. Deploy and test!
+
+## Quick Copy-Paste:
+
+Line to fix in `login.js`:
+```javascript
+const API_URL = window.location.origin + '/api';
+```
+
+Replace the ENTIRE line (line 1).
+
+Line to fix in `first-aid.js` (if file exists and has old API_URL):
+```javascript
+const API_URL = window.location.origin + '/api';
+```
+
+Replace `http://localhost:3000/api` if you see it anywhere.
+
+## If Still Having Issues:
+
+Clear your browser cache completely:
+1. Open DevTools (F12)
+2. Right-click refresh button → "Empty Cache and Hard Reload"
+3. OR: Ctrl+Shift+Delete (Chrome/Edge)
+4. OR: Ctrl+F5 (Firefox)
+5. Close all browser tabs and reopen
+
+Then try login again!

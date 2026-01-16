@@ -768,11 +768,12 @@ function showResults() {
 }
 
 function saveQuizProgress(quizId, score, totalQuestions) {
-  // Token no longer needed for API calls
+  const token = localStorage.getItem('y-safe-token');
   fetch(`${API_URL}/quiz-progress`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify({
       quizType: 'essentials',

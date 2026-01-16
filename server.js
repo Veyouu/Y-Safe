@@ -253,6 +253,15 @@ app.get('/api/quiz-progress/:quizType', requireAuth, (req, res) => {
   });
 });
 
+app.get('/api/quiz-progress', requireAuth, (req, res) => {
+  const userId = req.user.userId;
+  if (!userId) return res.status(400).json({ error: 'Invalid user' });
+  db.all('SELECT * FROM quiz_progress WHERE user_id = ? ORDER BY completed_at DESC', [userId], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.json({ progress: rows });
+  });
+});
+
 app.post('/api/lesson-progress', requireAuth, (req, res) => {
   const { lessonId, completed } = req.body;
   const userId = req.user.userId;

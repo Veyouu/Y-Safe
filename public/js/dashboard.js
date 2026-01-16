@@ -87,7 +87,7 @@ function fetchLessonProgress(token) {
 }
 
 function fetchQuizProgress(token) {
-  fetch(`${API_URL}/quiz-progress/first-aid`, {
+  fetch(`${API_URL}/quiz-progress`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
