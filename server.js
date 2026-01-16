@@ -27,14 +27,25 @@ const optionalAuth = (req, res, next) => {
   next();
 };
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'y-safe-secret-key-2026'; // In production, SECRET should be provided via env
-
+const JWT_SECRET = process.env.JWT_SECRET || 'y-safe-secret-key-2026';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'your-password';
-const adminHashedPassword = ADMIN_PASSWORD;
+const ADMIN_HASH = process.env.ADMIN_HASH || bcrypt.hashSync(ADMIN_PASSWORD, 10);
 const DATABASE_PATH = process.env.DATABASE_PATH || './database.sqlite';
 
 // Simple CORS policy: allow same-origin during development; adjust for prod
-app.use(cors({ origin: '*', credentials: true }));
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000', 'https://*.vercel.app'];
+app.use(cors({ 
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (process.env.NODE_ENV === 'production') {
+      const allowed = ALLOWED_ORIGINS.some(allowed => origin.includes(allowed) || allowed === '*');
+      callback(null, allowed);
+    } else {
+      callback(null, true);
+    }
+  },
+  credentials: true 
+}));
 // Body parser with JSON support and limit to mitigate DoS
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static('public'));
@@ -86,7 +97,8 @@ function initializeDatabase() {
     lesson_id TEXT NOT NULL,
     completed INTEGER DEFAULT 0,
     completed_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE(user_id, lesson_id)
   )`);
   
 }
@@ -168,10 +180,18 @@ app.get('/api/user', (req, res) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     if (!decoded.userId) return res.json({ user: { name: 'Guest', isGuest: true } });
     db.get('SELECT * FROM users WHERE id = ?', [decoded.userId], (err, user) => {
-      if (err || !user) return res.json({ user: { name: 'Guest', isGuest: true } });
+      if (err) {
+        console.error('Database error fetching user:', err);
+        return res.json({ user: { name: 'Guest', isGuest: true } });
+      }
+      if (!user) {
+        console.error('User not found for ID:', decoded.userId);
+        return res.json({ user: { name: 'Guest', isGuest: true } });
+      }
       res.json({ user: { id: user.id, name: user.name, section: user.section, isGuest: !!user.is_guest } });
     });
   } catch (e) {
+    console.error('Token verification error:', e);
     res.json({ user: { name: 'Guest', isGuest: true } });
   }
 });
@@ -180,6 +200,18 @@ app.post('/api/quiz-progress', requireAuth, (req, res) => {
   const { quizType, quizId, score, totalQuestions } = req.body;
   const userId = req.user.userId;
   if (!userId) return res.status(400).json({ error: 'Invalid user' });
+  if (!quizType || typeof quizType !== 'string' || quizType.trim() === '') {
+    return res.status(400).json({ error: 'Quiz type required' });
+  }
+  if (!quizId || typeof quizId !== 'string' || quizId.trim() === '') {
+    return res.status(400).json({ error: 'Quiz ID required' });
+  }
+  if (typeof score !== 'number' || score < 0 || score > totalQuestions) {
+    return res.status(400).json({ error: 'Invalid score' });
+  }
+  if (typeof totalQuestions !== 'number' || totalQuestions <= 0) {
+    return res.status(400).json({ error: 'Total questions must be positive' });
+  }
   const stmt = db.prepare('INSERT INTO quiz_progress (user_id, quiz_type, quiz_id, score, total_questions) VALUES (?, ?, ?, ?, ?)');
   stmt.run(userId, quizType, quizId, score, totalQuestions, function(err) {
     if (err) {
@@ -204,8 +236,11 @@ app.post('/api/lesson-progress', requireAuth, (req, res) => {
   const { lessonId, completed } = req.body;
   const userId = req.user.userId;
   if (!userId) return res.status(400).json({ error: 'Invalid user' });
+  if (!lessonId || typeof lessonId !== 'string' || lessonId.trim() === '') {
+    return res.status(400).json({ error: 'Lesson ID required' });
+  }
   const completedVal = completed ? 1 : 0;
-  const stmt = db.prepare('INSERT INTO lesson_progress (user_id, lesson_id, completed, completed_at) VALUES (?, ?, ?, ?)');
+  const stmt = db.prepare('INSERT OR REPLACE INTO lesson_progress (user_id, lesson_id, completed, completed_at) VALUES (?, ?, ?, ?)');
   stmt.run(userId, lessonId, completedVal, new Date().toISOString(), function(err) {
     if (err) {
       console.error('Lesson progress error:', err);
@@ -213,6 +248,7 @@ app.post('/api/lesson-progress', requireAuth, (req, res) => {
     }
     res.json({ success: true, message: 'Lesson progress saved' });
   });
+});
 });
 
 app.get('/api/lesson-progress', requireAuth, (req, res) => {
@@ -249,7 +285,10 @@ function adminAuth(req, res, next) {
 
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
-  if (password === adminHashedPassword) {
+  if (typeof password !== 'string' || password.trim() === '') {
+    return res.status(400).json({ error: 'Password required' });
+  }
+  if (bcrypt.compareSync(password, ADMIN_HASH)) {
     const token = jwt.sign({ isAdmin: true, name: 'Admin' }, JWT_SECRET, { expiresIn: '1d' });
     res.json({ token, message: 'Login successful' });
   } else {

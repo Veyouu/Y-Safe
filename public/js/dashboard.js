@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadDashboard();
   setupFeatureCardListeners();
   setupAdminLogin();
+  setupLogout();
   setupTutorial();
 });
 
@@ -130,4 +131,15 @@ function setupAdminLogin() {
   adminBtn.addEventListener('click', () => {
     window.location.href = 'admin-login.html';
   });
+}
+
+function setupLogout() {
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('y-safe-token');
+      localStorage.removeItem('y-safe-user');
+      window.location.href = 'index.html';
+    });
+  }
 }
