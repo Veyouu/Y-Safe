@@ -32,16 +32,16 @@
                     <p>We're glad you're here. This website is designed to help you learn simple first aid skills, understand safety awareness, and feel more confident in handling emergency situations.</p>
                 </div>
 
-                <form id="loginForm" class="login-form">
+                <form id="registrationForm" class="login-form">
                     <div class="form-group">
-                        <label for="name">Your Name *</label>
-                        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                        <label for="userName">Your Name *</label>
+                        <input type="text" id="userName" name="userName" placeholder="Enter your name" required>
                         <span class="error-message" id="nameError"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="section">Section <span class="optional">(optional)</span></label>
-                        <input type="text" id="section" name="section" placeholder="Enter your section">
+                        <label for="userSection">Section <span class="optional">(optional)</span></label>
+                        <input type="text" id="userSection" name="userSection" placeholder="Enter your section">
                     </div>
 
                     <button type="submit" class="btn btn-primary">
@@ -56,10 +56,7 @@
             </div>
         </div>
     </div>
-    <script>
-        // Redirect directly to dashboard
-        window.location.href = 'dashboard.html';
-    </script>
+    <script src="js/index.js"></script>
 </body>
 
 </html>
