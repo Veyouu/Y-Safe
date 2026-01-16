@@ -161,45 +161,67 @@ app.post('/api/login', (req, res) => {
 });
 
 app.get('/api/user', (req, res) => {
-  // No authentication required - return guest user info
-  res.json({ 
-    user: { 
-      name: 'Guest', 
-      isGuest: true 
-    } 
-  });
+  const header = req.headers.authorization;
+  if (!header) return res.json({ user: { name: 'Guest', isGuest: true } });
+  const token = header.startsWith('Bearer ') ? header.slice(7) : header;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!decoded.userId) return res.json({ user: { name: 'Guest', isGuest: true } });
+    db.get('SELECT * FROM users WHERE id = ?', [decoded.userId], (err, user) => {
+      if (err || !user) return res.json({ user: { name: 'Guest', isGuest: true } });
+      res.json({ user: { id: user.id, name: user.name, section: user.section, isGuest: !!user.is_guest } });
+    });
+  } catch (e) {
+    res.json({ user: { name: 'Guest', isGuest: true } });
+  }
 });
 
 app.post('/api/quiz-progress', requireAuth, (req, res) => {
-  // No authentication required - direct access
   const { quizType, quizId, score, totalQuestions } = req.body;
-  
-  // Always return success but don't record to database
-  res.json({ 
-    success: true, 
-    message: 'Progress received (not recorded in public mode)' 
+  const userId = req.user.userId;
+  if (!userId) return res.status(400).json({ error: 'Invalid user' });
+  const stmt = db.prepare('INSERT INTO quiz_progress (user_id, quiz_type, quiz_id, score, total_questions) VALUES (?, ?, ?, ?, ?)');
+  stmt.run(userId, quizType, quizId, score, totalQuestions, function(err) {
+    if (err) {
+      console.error('Quiz progress error:', err);
+      return res.status(500).json({ error: 'Database error: ' + err.message });
+    }
+    res.json({ success: true, message: 'Quiz progress saved' });
   });
 });
 
 app.get('/api/quiz-progress/:quizType', requireAuth, (req, res) => {
-  // No authentication required - return empty progress for public mode
-  res.json({ progress: [] });
+  const quizType = req.params.quizType;
+  const userId = req.user.userId;
+  if (!userId) return res.status(400).json({ error: 'Invalid user' });
+  db.all('SELECT * FROM quiz_progress WHERE user_id = ? AND quiz_type = ? ORDER BY completed_at DESC', [userId, quizType], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.json({ progress: rows });
+  });
 });
 
 app.post('/api/lesson-progress', requireAuth, (req, res) => {
-  // No authentication required - direct access
-  const { lessonId } = req.body;
-  
-  // Always return success but don't record to database
-  res.json({ 
-    success: true, 
-    message: 'Progress received (not recorded in public mode)' 
+  const { lessonId, completed } = req.body;
+  const userId = req.user.userId;
+  if (!userId) return res.status(400).json({ error: 'Invalid user' });
+  const completedVal = completed ? 1 : 0;
+  const stmt = db.prepare('INSERT INTO lesson_progress (user_id, lesson_id, completed, completed_at) VALUES (?, ?, ?, ?)');
+  stmt.run(userId, lessonId, completedVal, new Date().toISOString(), function(err) {
+    if (err) {
+      console.error('Lesson progress error:', err);
+      return res.status(500).json({ error: 'Database error: ' + err.message });
+    }
+    res.json({ success: true, message: 'Lesson progress saved' });
   });
 });
 
 app.get('/api/lesson-progress', requireAuth, (req, res) => {
-  // No authentication required - return empty progress for public mode
-  res.json({ progress: [] });
+  const userId = req.user.userId;
+  if (!userId) return res.status(400).json({ error: 'Invalid user' });
+  db.all('SELECT * FROM lesson_progress WHERE user_id = ? ORDER BY completed_at DESC', [userId], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.json({ progress: rows });
+  });
 });
 
 app.get('/health', (req, res) => {
