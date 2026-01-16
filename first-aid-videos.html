@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Aid Video Tutorials</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .topic-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .topic-title {
+            font-size: 1.5rem;
+            color: #4a5568;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-description {
+            color: #718096;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .stats {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .filter-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚑 First Aid Video Tutorials</h1>
+            <p class="subtitle">Essential medical emergency training videos</p>
+        </header>
+
+        <div class="stats">
+            <p><strong>Total Videos:</strong> <span id="videoCount">0</span> | 
+               <strong>Categories:</strong> <span id="categoryCount">0</span></p>
+        </div>
+
+        <div class="filter-section">
+            <h3 style="text-align: center; margin-bottom: 15px; color: #4a5568;">Filter by Category</h3>
+            <div class="filter-buttons" id="filterButtons">
+                <button class="filter-btn active" data-filter="all">All Videos</button>
+            </div>
+        </div>
+
+        <div class="topics-grid" id="topicsGrid">
+            <!-- Videos will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Video data organized by topic
+        const videoData = [
+            {
+                id: 'triangular-bandage-parts',
+                title: 'Parts of Triangular Bandage',
+                category: 'bandage',
+                videoId: 'A7UIePi5ngM',
+                description: 'Learn the different parts and components of a triangular bandage for proper first aid application.',
+                difficulty: 'beginner'
+            },
+            {
+                id: 'burn-face-head',
+                title: 'Burn on Face and/or Back of Head',
+                category: 'burn',
+                videoId: '4NnhldZISuQ',
+                description: 'Proper treatment techniques for burns affecting the face and head area.',
+                difficulty: 'intermediate'
+            },
+            {
+                id: 'triangular-bandage',
+                title: 'Triangular Bandage Application',
+                category: 'bandage',
+                videoId: '4NnhldZISuQ',
+                description: 'Complete guide on how to apply triangular bandages for various injuries.',
+                difficulty: 'beginner'
+            },
+            {
+                id: 'arm-sling',
+                title: 'Arm Sling Technique',
+                category: 'sling',
+                videoId: 'PzZPxMwozE4',
+                description: 'Step-by-step instructions for creating and applying arm slings.',
+                difficulty: 'beginner'
+            },
+            {
+                id: 'wound-forearm',
+                title: 'Wound on Forearm Treatment',
+                category: 'wound',
+                videoId: 'PzZPxMwozE4',
+                description: 'Proper first aid for wounds located on the forearm.',
+                difficulty: 'intermediate'
+            },
+            {
+                id: 'wound-head',
+                title: 'Wound on Top of Head',
+                category: 'wound',
+                videoId: 'PzZPxMwozE4',
+                description: 'Emergency treatment for head wounds and injuries.',
+                difficulty: 'advanced'
+            },
+            {
+                id: 'square-knot',
+                title: 'Square Knot Technique',
+                category: 'knot',
+                videoId: '40TQ7qFwEfs',
+                description: 'Essential knot-tying skill for securing bandages and dressings.',
+                difficulty: 'beginner'
+            },
+            {
+                id: 'burn-hand',
+                title: 'Burn on Hand Treatment',
+                category: 'burn',
+                videoId: 'x4QndeNf85A',
+                description: 'Proper first aid procedures for hand burns and injuries.',
+                difficulty: 'intermediate'
+            }
+        ];
+
+        // Category information
+        const categories = {
+            bandage: { name: 'Bandaging', color: '#e53e3e', icon: '🩹' },
+            burn: { name: 'Burn Treatment', color: '#dd6b20', icon: '🔥' },
+            sling: { name: 'Slings & Support', color: '#3182ce', icon: '💪' },
+            wound: { name: 'Wound Care', color: '#38a169', icon: '🩺' },
+            knot: { name: 'Knot Tying', color: '#805ad5', icon: '🪢' }
+        };
+
+        // Initialize the application
+        class FirstAidVideoApp {
+            constructor() {
+                this.videos = videoData;
+                this.currentFilter = 'all';
+                this.init();
+            }
+
+            init() {
+                this.renderVideos();
+                this.createFilterButtons();
+                this.updateStats();
+                this.attachEventListeners();
+            }
+
+            renderVideos(filter = 'all') {
+                const grid = document.getElementById('topicsGrid');
+                grid.innerHTML = '';
+
+                const filteredVideos = filter === 'all' 
+                    ? this.videos 
+                    : this.videos.filter(video => video.category === filter);
+
+                filteredVideos.forEach(video => {
+                    const videoCard = this.createVideoCard(video);
+                    grid.appendChild(videoCard);
+                });
+            }
+
+            createVideoCard(video) {
+                const category = categories[video.category];
+                const card = document.createElement('div');
+                card.className = 'topic-card';
+                card.dataset.category = video.category;
+
+                card.innerHTML = `
+                    <h3 class="topic-title">${category.icon} ${video.title}</h3>
+                    <div class="video-description">${video.description}</div>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/${video.videoId}?si=${this.generateRandomSI()}" 
+                            title="YouTube video player: ${video.title}"
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="controls">
+                        <button class="btn btn-primary" onclick="app.playVideo('${video.videoId}')">
+                            ▶️ Play
+                        </button>
+                        <button class="btn btn-secondary" onclick="app.showVideoInfo('${video.id}')">
+                            ℹ️ Details
+                        </button>
+                    </div>
+                `;
+
+                return card;
+            }
+
+            createFilterButtons() {
+                const filterContainer = document.getElementById('filterButtons');
+                filterContainer.innerHTML = '<button class="filter-btn active" data-filter="all">All Videos</button>';
+
+                Object.keys(categories).forEach(categoryKey => {
+                    const category = categories[categoryKey];
+                    const button = document.createElement('button');
+                    button.className = 'filter-btn';
+                    button.dataset.filter = categoryKey;
+                    button.textContent = `${category.icon} ${category.name}`;
+                    filterContainer.appendChild(button);
+                });
+            }
+
+            attachEventListeners() {
+                // Filter button clicks
+                document.getElementById('filterButtons').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('filter-btn')) {
+                        this.setFilter(e.target.dataset.filter);
+                    }
+                });
+            }
+
+            setFilter(filter) {
+                this.currentFilter = filter;
+                
+                // Update button states
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.filter === filter);
+                });
+
+                // Re-render videos
+                this.renderVideos(filter);
+            }
+
+            playVideo(videoId) {
+                // Find and play the specific video
+                const iframe = document.querySelector(`iframe[src*="${videoId}"]`);
+                if (iframe) {
+                    // Scroll to video
+                    iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Add highlight effect
+                    const card = iframe.closest('.topic-card');
+                    card.style.transform = 'scale(1.05)';
+                    card.style.boxShadow = '0 20px 50px rgba(0,0,0,0.4)';
+                    
+                    setTimeout(() => {
+                        card.style.transform = '';
+                        card.style.boxShadow = '';
+                    }, 2000);
+                }
+            }
+
+            showVideoInfo(videoId) {
+                const video = this.videos.find(v => v.id === videoId);
+                if (video) {
+                    const category = categories[video.category];
+                    alert(`
+📹 ${video.title}
+
+📝 Description: ${video.description}
+
+🏷️ Category: ${category.name} ${category.icon}
+
+📊 Difficulty: ${video.difficulty}
+
+🎥 Video ID: ${video.videoId}
+                    `);
+                }
+            }
+
+            updateStats() {
+                document.getElementById('videoCount').textContent = this.videos.length;
+                document.getElementById('categoryCount').textContent = Object.keys(categories).length;
+            }
+
+            generateRandomSI() {
+                // Generate random SI parameter for YouTube embeds
+                return Math.random().toString(36).substring(2, 15);
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new FirstAidVideoApp();
+        });
+    </script>
+</body>
+</html>

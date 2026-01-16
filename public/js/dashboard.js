@@ -1,25 +1,37 @@
 const API_URL = window.location.origin + '/api';
 
 document.addEventListener('DOMContentLoaded', () => {
-  checkAuthAndLoadData();
+  loadDashboard();
   setupFeatureCardListeners();
-  setupLogoutButton();
+  setupAdminLogin();
+  setupTutorial();
 });
 
-function checkAuthAndLoadData() {
-  const token = localStorage.getItem('y-safe-token');
-  const user = localStorage.getItem('y-safe-user');
+function setupTutorial() {
+  const closeBtn = document.getElementById('closeTutorial');
+  const tutorialSection = document.querySelector('.tutorial-section');
 
-  if (!token || !user) {
-    window.location.href = 'index.html';
-    return;
+  closeBtn.addEventListener('click', () => {
+    tutorialSection.style.display = 'none';
+    // Save preference to localStorage
+    localStorage.setItem('y-safe-tutorial-closed', 'true');
+  });
+
+  // Check if user has already closed tutorial
+  if (localStorage.getItem('y-safe-tutorial-closed') === 'true') {
+    tutorialSection.style.display = 'none';
   }
+}
 
-  const userData = JSON.parse(user);
-  document.getElementById('userName').textContent = userData.name;
-  document.getElementById('welcomeMessage').textContent = `Welcome, ${userData.name}!`;
-
-  fetchProgress(token);
+function loadDashboard() {
+  // Set default welcome message
+  document.getElementById('userName').textContent = 'Guest';
+  document.getElementById('welcomeMessage').textContent = 'Welcome to Y-SAFE!';
+  
+  // Set default progress to 0
+  document.getElementById('lessonsCompleted').textContent = '0';
+  document.getElementById('quizzesTaken').textContent = '0';
+  document.getElementById('averageScore').textContent = '0%';
 }
 
 function fetchProgress(token) {
@@ -93,21 +105,11 @@ function setupFeatureCardListeners() {
   });
 }
 
-function setupLogoutButton() {
-  const logoutBtn = document.getElementById('logoutBtn');
-  
-  logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('y-safe-token');
-    localStorage.removeItem('y-safe-user');
-    window.location.href = 'index.html';
+// Admin Login Button Function
+function setupAdminLogin() {
+  const adminBtn = document.getElementById('adminLoginBtn');
+
+  adminBtn.addEventListener('click', () => {
+    window.location.href = 'admin-login.html';
   });
-}
-
-function getUserData() {
-  const user = localStorage.getItem('y-safe-user');
-  return user ? JSON.parse(user) : null;
-}
-
-function getToken() {
-  return localStorage.getItem('y-safe-token');
 }

@@ -23,7 +23,7 @@ function handleLogin(e) {
   btnText.style.display = 'none';
   btnLoader.style.display = 'inline';
 
-  fetch(`${API_URL}/login`, {
+  fetch(`${API_URL}/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ function handleLogin(e) {
   })
   .catch(error => {
     console.error('Login error:', error);
-    nameError.textContent = 'An error occurred. Please try again.';
+    nameError.textContent = 'Connection error. Please check your internet and try again.';
     btnText.style.display = 'inline';
     btnLoader.style.display = 'none';
   });
@@ -56,14 +56,11 @@ function handleGuestLogin() {
 
   nameError.textContent = '';
 
-  if (!name) {
-    nameError.textContent = 'Please enter your name';
-    return;
-  }
+  // Name is optional for guests - no validation needed
 
   guestBtn.textContent = 'Loading...';
 
-  fetch(`${API_URL}/login`, {
+  fetch(`${API_URL}/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -82,7 +79,7 @@ function handleGuestLogin() {
   })
   .catch(error => {
     console.error('Guest login error:', error);
-    nameError.textContent = 'An error occurred. Please try again.';
+    nameError.textContent = 'Connection error. Please check your internet and try again.';
     guestBtn.textContent = 'Continue as Guest';
   });
 }

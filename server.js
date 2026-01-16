@@ -1,10 +1,10 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
-const cors = require('cors');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const path = require('path');
-const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,60 +20,42 @@ const db = new sqlite3.Database(DATABASE_PATH, sqlite3.OPEN_READWRITE | sqlite3.
   if (err) {
     console.error('Database connection error:', err);
     console.error('Database path:', DATABASE_PATH);
+    process.exit(1);
   } else {
-    console.log('Connected to database');
+    console.log('Connected to SQLite database at:', DATABASE_PATH);
     initializeDatabase();
   }
 });
 
 function initializeDatabase() {
-  db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      section TEXT,
-      is_guest INTEGER DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`);
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    section TEXT,
+    is_guest INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
 
-    db.run(`CREATE TABLE IF NOT EXISTS quiz_progress (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      quiz_type TEXT NOT NULL,
-      quiz_id TEXT NOT NULL,
-      score INTEGER NOT NULL,
-      total_questions INTEGER NOT NULL,
-      completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id)
-    )`);
+  db.run(`CREATE TABLE IF NOT EXISTS quiz_progress (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    quiz_type TEXT NOT NULL,
+    quiz_id TEXT NOT NULL,
+    score INTEGER,
+    total_questions INTEGER,
+    completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
 
-    db.run(`CREATE TABLE IF NOT EXISTS lesson_progress (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      lesson_id TEXT NOT NULL,
-      completed INTEGER DEFAULT 0,
-      completed_at DATETIME,
-      FOREIGN KEY (user_id) REFERENCES users(id),
-      UNIQUE(user_id, lesson_id)
-    )`);
-  });
+  db.run(`CREATE TABLE IF NOT EXISTS lesson_progress (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    lesson_id TEXT NOT NULL,
+    completed INTEGER DEFAULT 0,
+    completed_at DATETIME,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
 }
-
-app.post('/api/admin/login', (req, res) => {
-  const { password } = req.body;
-
-  if (password === ADMIN_PASSWORD) {
-    const token = jwt.sign(
-      { role: 'admin' },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    res.json({ token, role: 'admin' });
-  } else {
-    res.status(401).json({ error: 'Invalid password' });
-  }
-});
 
 app.post('/api/register', (req, res) => {
   const { name, section, isGuest } = req.body;
@@ -206,9 +188,160 @@ app.get('/api/lesson-progress', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+function adminAuth(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!decoded.isAdmin) {
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+    req.admin = decoded;
+    next();
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+}
+
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  
+  if (password === ADMIN_PASSWORD) {
+    const token = jwt.sign(
+      { isAdmin: true, name: 'Admin' },
+      JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+    res.json({ token, message: 'Login successful' });
+  } else {
+    res.status(401).json({ error: 'Invalid password' });
+  }
+});
+
+app.get('/api/admin/users', adminAuth, (req, res) => {
+  db.all(
+    'SELECT * FROM users ORDER BY created_at DESC',
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      res.json({ users: rows });
+    }
+  );
+});
+
+app.get('/api/admin/quizzes', adminAuth, (req, res) => {
+  db.all(
+    `SELECT qp.*, u.name as user_name, u.section 
+     FROM quiz_progress qp 
+     JOIN users u ON qp.user_id = u.id 
+     ORDER BY qp.completed_at DESC`,
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      res.json({ quizzes: rows });
+    }
+  );
+});
+
+app.get('/api/admin/lessons', adminAuth, (req, res) => {
+  db.all(
+    `SELECT lp.*, u.name as user_name, u.section 
+     FROM lesson_progress lp 
+     JOIN users u ON lp.user_id = u.id 
+     ORDER BY lp.completed_at DESC`,
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      res.json({ lessons: rows });
+    }
+  );
+});
+
+app.get('/api/admin/user/:id', adminAuth, (req, res) => {
+  const userId = req.params.id;
+  
+  db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    db.all(
+      'SELECT * FROM quiz_progress WHERE user_id = ? ORDER BY completed_at DESC',
+      [userId],
+      (err, quizzes) => {
+        if (err) {
+          return res.status(500).json({ error: 'Database error' });
+        }
+
+        db.all(
+          'SELECT * FROM lesson_progress WHERE user_id = ? ORDER BY completed_at DESC',
+          [userId],
+          (err, lessons) => {
+            if (err) {
+              return res.status(500).json({ error: 'Database error' });
+            }
+
+            res.json({
+              user,
+              quizzes,
+              lessons
+            });
+          }
+        );
+      }
+    );
+  });
+});
+
+app.get('/api/admin/stats', adminAuth, (req, res) => {
+  db.get('SELECT COUNT(*) as count FROM users', (err, usersResult) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    db.get('SELECT COUNT(*) as count FROM quiz_progress', (err, quizzesResult) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+
+      db.get('SELECT COUNT(*) as count FROM lesson_progress', (err, lessonsResult) => {
+        if (err) {
+          return res.status(500).json({ error: 'Database error' });
+        }
+
+        db.get('SELECT AVG(CAST(score AS FLOAT) / CAST(total_questions AS FLOAT)) * 100 as avg FROM quiz_progress', (err, scoreResult) => {
+          if (err) {
+            return res.status(500).json({ error: 'Database error' });
+          }
+
+          const avgScore = scoreResult.avg ? Math.round(scoreResult.avg) : 0;
+
+          res.json({
+            totalUsers: usersResult.count,
+            totalQuizzes: quizzesResult.count,
+            totalLessons: lessonsResult.count,
+            averageScore: avgScore
+          });
+        });
+      });
+    });
+  });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Y-SAFE Web server running on http://localhost:${PORT}`);
 });
