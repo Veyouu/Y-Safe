@@ -148,6 +148,7 @@ app.post('/api/login', (req, res) => {
   if (!isGuest && (typeof name !== 'string' || name.trim() === '')) {
     return res.status(400).json({ error: 'Name is required for registered users' });
   }
+  // For guests, don't save to database
   if (isGuest) {
     const guestName = typeof name === 'string' && name.trim() !== '' ? name.trim() : 'Guest';
     const token = jwt.sign(
@@ -157,19 +158,39 @@ app.post('/api/login', (req, res) => {
     );
     return res.json({ token, user: { id: null, name: guestName, section, isGuest: true } });
   }
-  const stmt = db.prepare('INSERT INTO users (name, section, is_guest) VALUES (?, ?, ?)');
-  stmt.run(name, section || null, 0, function(err) {
-    if (err) {
-      console.error('Login database error:', err);
-      return res.status(500).json({ error: 'Database error: ' + err.message });
+  // For registered users, find existing user or create new
+  db.get(
+    'SELECT * FROM users WHERE name = ? AND is_guest = 0 LIMIT 1',
+    [name],
+    (err, user) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error: ' + err.message });
+      }
+      if (user) {
+        // User exists - return their existing data with same ID
+        const token = jwt.sign(
+          { userId: user.id, name: user.name, isGuest: false },
+          JWT_SECRET,
+          { expiresIn: '7d' }
+        );
+        res.json({ token, user: { id: user.id, name: user.name, section: user.section, isGuest: false } });
+      } else {
+        // User doesn't exist - create new account
+        const stmt = db.prepare('INSERT INTO users (name, section, is_guest) VALUES (?, ?, ?)');
+        stmt.run(name, section || null, 0, function(err) {
+          if (err) {
+            return res.status(500).json({ error: 'Database error: ' + err.message });
+          }
+          const token = jwt.sign(
+            { userId: this.lastID, name, isGuest: false },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+          );
+          res.json({ token, user: { id: this.lastID, name, section, isGuest: false } });
+        });
+      }
     }
-    const token = jwt.sign(
-      { userId: this.lastID, name, isGuest: false },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-    res.json({ token, user: { id: this.lastID, name, section, isGuest: false } });
-  });
+  );
 });
 
 app.get('/api/user', (req, res) => {
