@@ -17,7 +17,6 @@ function requireAuth(req, res, next) {
   next();
 }
 
-
 // Optional authentication middleware (token-based) loaded early for quick routing guards
 const optionalAuth = (req, res, next) => {
   const header = req.headers.authorization;
@@ -26,6 +25,7 @@ const optionalAuth = (req, res, next) => {
   try { req.user = jwt.verify(token, JWT_SECRET); } catch (e) { req.user = null; }
   next();
 };
+
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'y-safe-secret-key-2026';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'your-password';
@@ -46,6 +46,7 @@ app.use(cors({
   },
   credentials: true 
 }));
+
 // Body parser with JSON support and limit to mitigate DoS
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static('public'));

@@ -38,7 +38,7 @@ class YouTubeVideoManager {
                 id: 'wound-forearm',
                 title: 'Wound on Forearm Treatment',
                 topic: 'wound-care',
-                videoId: 'PzZPxMwozE4',
+                videoId: 'CT9GvWkadCI',
                 description: 'Proper first aid for wounds located on the forearm',
                 duration: '7:12'
             },
@@ -46,7 +46,7 @@ class YouTubeVideoManager {
                 id: 'wound-head',
                 title: 'Wound on Top of Head',
                 topic: 'wound-care',
-                videoId: 'PzZPxMwozE4',
+                videoId: 'xrr9JZTEwf0',
                 description: 'Emergency treatment for head wounds and injuries',
                 duration: '9:20'
             },
