@@ -1,12 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Y-SAFE Index Page loaded');
   
+  // Check if user is already logged in
+  checkExistingUser();
+  
   const registrationForm = document.getElementById('registrationForm');
   const guestBtn = document.getElementById('guestBtn');
   const API_URL = window.location.origin + '/api';
 
-  registrationForm.addEventListener('submit', handleRegistration);
-  guestBtn.addEventListener('click', handleGuestLogin);
+  function checkExistingUser() {
+    const token = localStorage.getItem('user-token');
+    const userInfo = localStorage.getItem('user-info');
+    
+    if (token && userInfo) {
+      try {
+        const user = JSON.parse(userInfo);
+        console.log('User already logged in:', user);
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        console.error('Error parsing saved user data:', error);
+        localStorage.removeItem('user-token');
+        localStorage.removeItem('user-info');
+      }
+    }
+  }
+
+  if (registrationForm) {
+    registrationForm.addEventListener('submit', handleRegistration);
+  }
+  
+  if (guestBtn) {
+    guestBtn.addEventListener('click', handleGuestLogin);
+  }
 
   function handleRegistration(e) {
     e.preventDefault();
@@ -42,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(response => response.json())
     .then(data => {
       if (data.token) {
-        localStorage.setItem('y-safe-token', data.token);
-        localStorage.setItem('y-safe-user', JSON.stringify(data.user));
+        localStorage.setItem('user-token', data.token);
+        localStorage.setItem('user-info', JSON.stringify(data.user));
         window.location.href = 'dashboard.html';
       } else {
         throw new Error(data.error || 'Registration failed');
@@ -58,8 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function handleGuestLogin() {
-    const name = document.getElementById('userName').value.trim();
-    const section = document.getElementById('userSection').value.trim();
     guestBtn.textContent = 'Loading...';
     guestBtn.disabled = true;
 
@@ -69,16 +92,16 @@ document.addEventListener('DOMContentLoaded', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
-        name: name || 'Guest', 
-        section,
+        name: 'Guest', 
+        section: '', 
         isGuest: true 
       })
     })
     .then(response => response.json())
     .then(data => {
       if (data.token) {
-        localStorage.setItem('y-safe-token', data.token);
-        localStorage.setItem('y-safe-user', JSON.stringify(data.user));
+        localStorage.setItem('user-token', data.token);
+        localStorage.setItem('user-info', JSON.stringify(data.user));
         window.location.href = 'dashboard.html';
       } else {
         throw new Error(data.error || 'Guest login failed');

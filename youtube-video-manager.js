@@ -3,6 +3,38 @@ class YouTubeVideoManager {
     constructor() {
         this.videos = [
             {
+                id: 'wound-head',
+                title: 'Wound Top of the Head',
+                topic: 'wound-care',
+                videoId: 'xrr9JZTEwf0',
+                description: 'Emergency treatment for wounds on top of the head',
+                duration: '9:20'
+            },
+            {
+                id: 'wound-forearm',
+                title: 'Wound on Forearm',
+                topic: 'wound-care',
+                videoId: 'CT9GvWkadCI',
+                description: 'Proper first aid for wounds located on the forearm',
+                duration: '7:12'
+            },
+            {
+                id: 'triangular-bandage-folds',
+                title: 'Triangular Bandage Folds',
+                topic: 'bandage-basics',
+                videoId: 'N-om6XQHgQI',
+                description: 'Learn different folds and techniques for triangular bandages',
+                duration: '6:45'
+            },
+            {
+                id: 'square-knot',
+                title: 'Square Knot',
+                topic: 'knot-tying',
+                videoId: '40TQ7qFwEfs',
+                description: 'Essential knot-tying skill for securing bandages and dressings',
+                duration: '3:45'
+            },
+            {
                 id: 'triangular-bandage-parts',
                 title: 'Parts of Triangular Bandage',
                 topic: 'bandage-basics',
@@ -12,59 +44,27 @@ class YouTubeVideoManager {
             },
             {
                 id: 'burn-face-head',
-                title: 'Burn on Face and/or Back of Head',
+                title: 'Burn on the Face and or Back of the Head',
                 topic: 'burn-treatment',
                 videoId: '4NnhldZISuQ',
                 description: 'Proper treatment techniques for burns affecting the face and head area',
                 duration: '8:15'
             },
             {
-                id: 'triangular-bandage-application',
-                title: 'Triangular Bandage Application',
-                topic: 'bandage-basics',
-                videoId: '4NnhldZISuQ',
-                description: 'Complete guide on how to apply triangular bandages for various injuries',
-                duration: '6:45'
-            },
-            {
-                id: 'arm-sling',
-                title: 'Arm Sling Technique',
-                topic: 'slings-support',
-                videoId: 'PzZPxMwozE4',
-                description: 'Step-by-step instructions for creating and applying arm slings',
-                duration: '4:30'
-            },
-            {
-                id: 'wound-forearm',
-                title: 'Wound on Forearm Treatment',
-                topic: 'wound-care',
-                videoId: 'CT9GvWkadCI',
-                description: 'Proper first aid for wounds located on the forearm',
-                duration: '7:12'
-            },
-            {
-                id: 'wound-head',
-                title: 'Wound on Top of Head',
-                topic: 'wound-care',
-                videoId: 'xrr9JZTEwf0',
-                description: 'Emergency treatment for head wounds and injuries',
-                duration: '9:20'
-            },
-            {
-                id: 'square-knot',
-                title: 'Square Knot Technique',
-                topic: 'knot-tying',
-                videoId: '40TQ7qFwEfs',
-                description: 'Essential knot-tying skill for securing bandages and dressings',
-                duration: '3:45'
-            },
-            {
                 id: 'burn-hand',
-                title: 'Burn on Hand Treatment',
+                title: 'Burn on Hand',
                 topic: 'burn-treatment',
                 videoId: 'x4QndeNf85A',
                 description: 'Proper first aid procedures for hand burns and injuries',
                 duration: '6:30'
+            },
+            {
+                id: 'arm-sling',
+                title: 'Arm Sling',
+                topic: 'slings-support',
+                videoId: 'PzZPxMwozE4',
+                description: 'Step-by-step instructions for creating and applying arm slings',
+                duration: '4:30'
             }
         ];
 
@@ -247,7 +247,7 @@ class YouTubeVideoManager {
         if (!video) return;
 
         const modal = document.getElementById('videoModal');
-        const modalVideoContainer = document.getElementById('videoModal');
+        const modalVideoContainer = document.getElementById('modalVideoContainer');
         const modalInfo = document.getElementById('modalInfo');
 
         // Show modal

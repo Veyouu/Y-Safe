@@ -49,7 +49,15 @@ app.use(cors({
 
 // Body parser with JSON support and limit to mitigate DoS
 app.use(express.json({ limit: '1mb' }));
-app.use(express.static('public'));
+
+// Serve static files with proper MIME types for ES6 modules
+app.use(express.static('public', {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.mjs') || path.endsWith('.js')) {
+            res.set('Content-Type', 'application/javascript');
+        }
+    }
+}));
 
 // Lightweight input validation placeholder (to be expanded with a proper lib in Phase 0)
 

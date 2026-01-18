@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +15,6 @@
 </head>
 
 <body>
-
     <div id="app">
         <div class="login-container">
             <div class="login-card">
@@ -42,21 +40,53 @@
                     <div class="form-group">
                         <label for="userSection">Section <span class="optional">(optional)</span></label>
                         <input type="text" id="userSection" name="userSection" placeholder="Enter your section">
+                        <span class="error-message" id="sectionError"></span>
                     </div>
 
                     <button type="submit" class="btn btn-primary">
-            <span class="btn-text">Start Learning</span>
-            <span class="btn-loader" style="display: none;">Loading...</span>
-          </button>
+                        <span class="btn-text">Start Learning</span>
+                        <span class="btn-loader" style="display: none;">Loading...</span>
+                    </button>
 
                     <button type="button" id="guestBtn" class="btn btn-secondary">
-            Continue as Guest
-          </button>
+                        Continue as Guest
+                    </button>
                 </form>
             </div>
         </div>
     </div>
+
     <script src="js/index.js"></script>
+    <script>
+        // Add some CSS for error states
+        const style = document.createElement('style');
+        style.textContent = `
+            .login-form input.error {
+                border-color: var(--emergency-red) !important;
+                box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.2) !important;
+            }
+
+            .login-form input.error:focus {
+                border-color: var(--emergency-red) !important;
+                box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.2) !important;
+            }
+
+            .btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+            .btn-loader {
+                animation: pulse 1.5s ease-in-out infinite alternate;
+            }
+
+            @keyframes pulse {
+                from { opacity: 1; }
+                to { opacity: 0.6; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 
 </html>

@@ -1,83 +1,104 @@
 // Safety Module - Clean and Organized
-const API_URL = window.location.origin;
+import { 
+    syncCompletedTopicsWithDatabase, 
+    loadCompletedTopics,
+    saveLessonProgress,
+    saveQuizProgress,
+    closeModal,
+    openModal,
+    closeAllModals,
+    updateLessonCard,
+    updateCompletedTopicsCount,
+    updateQuizButton,
+    showQuestion,
+    selectQuizOption,
+    showQuizResults,
+    setupCommonEventListeners,
+    checkAuth
+} from './utils.js';
 
-let currentUserId = null;
-let completedTopics = {};
 let currentLesson = null;
 let currentQuiz = [];
 let currentQuestionIndex = 0;
 let correctAnswers = 0;
 let selectedOption = null;
+let completedTopics = {};
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         console.log('Safety page loaded');
-        await syncCompletedTopicsWithDatabase();
+        completedTopics = await syncCompletedTopicsWithDatabase() || loadCompletedTopics();
         setupEventListeners();
-        updateCompletedTopics();
-        updateQuizButton();
+        updateUI();
     } catch (error) {
         console.error('Error initializing safety page:', error);
     }
 });
 
-// Database synchronization
-async function syncCompletedTopicsWithDatabase() {
-    const token = localStorage.getItem('y-safe-token');
-    if (!token) return false;
+// Setup event listeners specific to safety page
+function setupEventListeners() {
+    setupCommonEventListeners();
     
-    try {
-        const response = await fetch(`${API_URL}/lesson-progress`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!response.ok) return false;
-        
-        const data = await response.json();
-        const dbProgress = data.progress || {};
-        
-        completedTopics = {};
-        dbProgress.forEach(lesson => {
-            if (lesson.completed) {
-                completedTopics[lesson.lesson_id] = true;
+    // Lesson cards
+    document.querySelectorAll('.btn-lesson').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const card = btn.closest('.lesson-card');
+            if (card && card.dataset.lesson) {
+                openLesson(card.dataset.lesson);
             }
         });
-        
-        localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
-        return true;
-    } catch (e) {
-        console.error('Error syncing completed topics:', e);
-        return false;
-    }
-}
+    });
 
-// Get current user ID from token
-async function getCurrentUserId() {
-    const token = localStorage.getItem('y-safe-token');
-    if (!token) return null;
-    
-    try {
-        const response = await fetch(`${API_URL}/user`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+    // Mark completed button
+    const markBtn = document.getElementById('markCompletedBtn');
+    if (markBtn) {
+        markBtn.addEventListener('click', markTopicCompleted);
+    }
+
+    // Quiz button
+    const quizBtn = document.getElementById('safetyQuizBtn');
+    if (quizBtn) {
+        quizBtn.addEventListener('click', () => startMainQuiz('safety'));
+    }
+
+    // Next question button
+    const nextBtn = document.getElementById('nextQuestionBtn');
+    if (nextBtn) {
+        nextBtn.addEventListener('click', handleNextQuestion);
+    }
+
+    // Submit quiz button
+    const submitBtn = document.getElementById('submitQuizBtn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', showResults);
+    }
+
+    // Back button
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'dashboard.html';
         });
-        if (!response.ok) return null;
-        
-        const data = await response.json();
-        return data.user?.id || null;
-    } catch (e) {
-        console.error('Error getting user:', e);
-        return null;
     }
 }
 
-// Load completed topics from localStorage
-function loadCompletedTopics() {
-    try {
-        completedTopics = JSON.parse(localStorage.getItem('y-safe-completed-topics') || '{}');
-    } catch (e) {
-        console.error('Error loading completed topics:', e);
-        completedTopics = {};
-    }
+// Update UI elements
+function updateUI() {
+    const completedCount = Object.keys(completedTopics).filter(key => 
+        Object.keys(lessons).includes(key)).length;
+    const totalLessons = Object.keys(lessons).length;
+    
+    updateCompletedTopicsCount(completedCount, totalLessons);
+    updateQuizButton('safetyQuizBtn', completedCount, totalLessons);
+    
+    // Update lesson cards
+    Object.keys(completedTopics).forEach(lessonId => {
+        if (lessons[lessonId]) {
+            updateLessonCard(lessonId, true);
+        }
+    });
 }
 
 // Lesson data with complete Do's and Don'ts
@@ -116,8 +137,7 @@ const lessons = {
                 <li>Don't throw water on electrical or oil fires.</li>
                 <li>Don't hide in rooms—always move toward an exit if safe.</li>
             </ul>
-        `,
-        quiz: []
+        `
     },
     earthquake: {
         title: 'Earthquake Warning Signs',
@@ -149,8 +169,7 @@ const lessons = {
                 <li>Don't re-enter damaged buildings until authorities say it is safe.</li>
                 <li>Don't ignore aftershocks—they can be as dangerous as the first quake.</li>
             </ul>
-        `,
-        quiz: []
+        `
     },
     evacuation: {
         title: 'Importance of Evacuation Plans and Safe Areas for Typhoons',
@@ -180,8 +199,7 @@ const lessons = {
                 <li>Don't return home early without clearance from authorities.</li>
                 <li>Don't stay in weak structures during strong winds and heavy rain.</li>
             </ul>
-        `,
-        quiz: []
+        `
     }
 };
 
@@ -218,45 +236,6 @@ const mainLessonQuiz = {
     }
 };
 
-// Event setup
-function setupEventListeners() {
-    // Lesson cards
-    document.querySelectorAll('.btn-lesson').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const card = btn.closest('.lesson-card');
-            if (card && card.dataset.lesson) {
-                openLesson(card.dataset.lesson);
-            }
-        });
-    });
-
-    // Modal close buttons
-    document.querySelectorAll('.modal-close').forEach(btn => {
-        btn.addEventListener('click', closeAllModals);
-    });
-
-    // Mark completed button
-    const markBtn = document.getElementById('markCompletedBtn');
-    if (markBtn) {
-        markBtn.addEventListener('click', markTopicCompleted);
-    }
-
-    // Quiz button
-    const quizBtn = document.getElementById('safetyQuizBtn');
-    if (quizBtn) {
-        quizBtn.addEventListener('click', () => startMainQuiz('safety'));
-    }
-
-    // Back button
-    const backBtn = document.getElementById('backBtn');
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            window.location.href = 'dashboard.html';
-        });
-    }
-}
-
 // Open lesson modal
 function openLesson(lessonId) {
     const lesson = lessons[lessonId];
@@ -269,58 +248,33 @@ function openLesson(lessonId) {
     
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
-    const modal = document.getElementById('lessonModal');
     
-    if (!modalTitle || !modalBody || !modal) {
+    if (!modalTitle || !modalBody) {
         console.error('Modal elements not found');
         return;
     }
 
     modalTitle.textContent = lesson.title;
     modalBody.innerHTML = lesson.content;
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-
-// Close all modals
-function closeAllModals() {
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.style.display = 'none';
-    });
-    document.body.style.overflow = 'auto';
+    openModal('lessonModal');
 }
 
 // Mark topic as completed
 async function markTopicCompleted() {
     if (!currentLesson || completedTopics[currentLesson]) return;
 
-    const token = localStorage.getItem('y-safe-token');
-    if (token) {
-        try {
-            const response = await fetch(`${API_URL}/lesson-progress`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    lessonId: currentLesson,
-                    completed: true
-                })
-            });
-        } catch (error) {
-            console.error('Error saving lesson progress:', error);
-        }
+    // Save to database
+    if (checkAuth()) {
+        await saveLessonProgress(currentLesson, true);
     }
 
+    // Update local state
     completedTopics[currentLesson] = true;
     localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
     
-    updateLessonCard(currentLesson, true);
-    updateCompletedTopics();
-    updateQuizButton();
+    updateUI();
     
-    // Update button
+    // Update button state
     const markBtn = document.getElementById('markCompletedBtn');
     if (markBtn) {
         markBtn.textContent = 'Completed';
@@ -330,108 +284,29 @@ async function markTopicCompleted() {
     }
 }
 
-// Update lesson card UI
-function updateLessonCard(lessonId, isCompleted) {
-    const card = document.querySelector(`[data-lesson="${lessonId}"]`);
-    if (card) {
-        if (isCompleted) {
-            card.classList.add('completed');
-        } else {
-            card.classList.remove('completed');
-        }
-    }
-}
-
-// Update completed topics count
-function updateCompletedTopics() {
-    const completedCount = document.getElementById('completedTopics');
-    if (completedCount) {
-        completedCount.textContent = Object.keys(completedTopics).filter(key => 
-            Object.keys(lessons).includes(key)).length;
-    }
-}
-
-// Update quiz button
-function updateQuizButton() {
-    const quizBtn = document.getElementById('safetyQuizBtn');
-    const completedCount = Object.keys(completedTopics).filter(key => 
-        Object.keys(lessons).includes(key)).length;
-    const totalLessons = Object.keys(lessons).length;
-    
-    if (quizBtn) {
-        quizBtn.disabled = completedCount < totalLessons;
-    }
-}
-
 // Start main quiz
 function startMainQuiz(lessonType) {
-    currentQuiz = [...mainLessonQuiz[lessonType].questions];
+    const quizData = mainLessonQuiz[lessonType];
+    if (!quizData) {
+        console.error('Quiz not found:', lessonType);
+        return;
+    }
+
+    currentQuiz = [...quizData.questions];
     currentQuestionIndex = 0;
     correctAnswers = 0;
 
-    const quizTitle = document.getElementById('quizTitle');
-    const totalQuestions = document.getElementById('totalQuestions');
-    const quizModal = document.getElementById('quizModal');
-    const nextBtn = document.getElementById('nextQuestionBtn');
-    const submitBtn = document.getElementById('submitQuizBtn');
-
-    if (!quizModal || !quizTitle || !totalQuestions) {
-        console.error('Quiz modal elements not found');
-        return;
-    }
-
-    quizTitle.textContent = mainLessonQuiz[lessonType].title;
-    totalQuestions.textContent = currentQuiz.length;
-    quizModal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-
-    showQuestion();
-    if (nextBtn) nextBtn.style.display = 'inline-flex';
-    if (submitBtn) submitBtn.style.display = 'none';
+    startQuiz(currentQuiz, quizData.title, 'quizModal');
+    showCurrentQuestion();
 }
 
-// Show quiz question
-function showQuestion() {
-    const questionEl = document.getElementById('quizQuestion');
-    const optionsEl = document.getElementById('quizOptions');
-    const currentEl = document.getElementById('currentQuestion');
-    const nextBtn = document.getElementById('nextQuestionBtn');
-    const submitBtn = document.getElementById('submitQuizBtn');
-
-    if (!questionEl || !optionsEl || !currentEl) {
-        console.error('Quiz elements not found');
-        return;
-    }
-
+// Show current quiz question
+function showCurrentQuestion() {
     const question = currentQuiz[currentQuestionIndex];
     if (!question) return;
 
-    questionEl.textContent = question.question;
-    currentEl.textContent = currentQuestionIndex + 1;
-    
-    optionsEl.innerHTML = '';
-    question.options.forEach((option, index) => {
-        const optionEl = document.createElement('div');
-        optionEl.className = 'quiz-option';
-        optionEl.textContent = option;
-        optionEl.onclick = () => selectOption(index, optionEl);
-        optionsEl.appendChild(optionEl);
-    });
-
-    if (nextBtn) nextBtn.disabled = true;
+    showQuestion(question.question, question.options, currentQuestionIndex, currentQuiz.length);
     selectedOption = null;
-}
-
-// Select quiz option
-function selectOption(index, element) {
-    document.querySelectorAll('.quiz-option').forEach(opt => 
-        opt.classList.remove('selected'));
-    
-    element.classList.add('selected');
-    selectedOption = index;
-    
-    const nextBtn = document.getElementById('nextQuestionBtn');
-    if (nextBtn) nextBtn.disabled = false;
 }
 
 // Handle next question
@@ -447,85 +322,26 @@ function handleNextQuestion() {
     if (currentQuestionIndex >= currentQuiz.length) {
         showResults();
     } else {
-        showQuestion();
+        showCurrentQuestion();
     }
 }
 
 // Show quiz results
 function showResults() {
-    const quizModal = document.getElementById('quizModal');
-    const resultModal = document.getElementById('quizResultModal');
-    
-    if (!resultModal || !quizModal) {
-        console.error('Result modal not found');
-        return;
-    }
-
     const total = currentQuiz.length;
-    const percentage = Math.round((correctAnswers / total) * 100);
-
-    document.getElementById('correctCount').textContent = correctAnswers;
-    document.getElementById('totalCount').textContent = total;
-    document.getElementById('resultScore').textContent = `${percentage}%`;
-
-    let message = '';
-    if (percentage >= 80) {
-        message = 'Excellent! You have mastered this topic!';
-    } else if (percentage >= 60) {
-        message = 'Good job! You understand the basics well.';
-    } else {
-        message = 'Keep learning! Review the lessons and try again.';
-    }
-
-    document.getElementById('resultMessage').textContent = message;
-
-    quizModal.style.display = 'none';
-    resultModal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    showQuizResults(correctAnswers, total, 'quizResultModal');
     
-    saveQuizProgress('safety', correctAnswers, total);
-}
-
-// Save quiz progress
-async function saveQuizProgress(quizId, score, totalQuestions) {
-    const token = localStorage.getItem('y-safe-token');
-    if (!token) return;
-    
-    try {
-        await fetch(`${API_URL}/quiz-progress`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                quizType: quizId,
-                quizId: quizId,
-                score,
-                totalQuestions
-            })
-        });
-    } catch (error) {
-        console.error('Error saving quiz progress:', error);
+    // Save quiz progress
+    if (checkAuth()) {
+        saveQuizProgress('safety', 'safety', correctAnswers, total);
     }
 }
 
-// Setup next question button
-document.addEventListener('DOMContentLoaded', () => {
-    const nextBtn = document.getElementById('nextQuestionBtn');
-    const submitBtn = document.getElementById('submitQuizBtn');
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', handleNextQuestion);
-    }
-    
-    if (submitBtn) {
-        submitBtn.addEventListener('click', () => {
-            if (selectedOption !== null && 
-                selectedOption === currentQuiz[currentQuestionIndex].correct) {
-                correctAnswers++;
-            }
-            showResults();
-        });
+// Handle quiz option selection
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('quiz-option')) {
+        const options = document.querySelectorAll('.quiz-option');
+        const index = Array.from(options).indexOf(e.target);
+        selectedOption = selectQuizOption(index, e.target);
     }
 });

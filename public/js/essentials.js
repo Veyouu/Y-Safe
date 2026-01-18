@@ -452,6 +452,18 @@ document.addEventListener('DOMContentLoaded', () => {
       setupModal();
       updateQuizButton();
       updateCompletedTopics();
+      
+      // Universal fallback for dashboard button
+      document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (target.id === 'backBtn' || target.classList.contains('btn-back') || 
+            target.closest('#backBtn') || target.closest('.btn-back')) {
+          e.preventDefault();
+          console.log('Universal dashboard button handler triggered');
+          window.location.href = 'dashboard.html';
+        }
+      });
+      
       console.log('Essentials page loaded successfully');
     }
     
@@ -464,9 +476,27 @@ document.addEventListener('DOMContentLoaded', () => {
 // Authentication check removed - no longer needed
 
 function setupBackButton() {
-  document.getElementById('backBtn').addEventListener('click', () => {
-    window.location.href = 'dashboard.html';
-  });
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    // Remove any existing event listeners
+    backBtn.replaceWith(backBtn.cloneNode(true));
+    const newBackBtn = document.getElementById('backBtn');
+    
+    newBackBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log('Dashboard button clicked - going to dashboard');
+      window.location.href = 'dashboard.html';
+    });
+    
+    // Also add onclick as backup
+    newBackBtn.onclick = function(e) {
+      e.preventDefault();
+      console.log('Dashboard onclick triggered - going to dashboard');
+      window.location.href = 'dashboard.html';
+    };
+  } else {
+    console.error('Back button not found!');
+  }
 }
 
 function setupEssentialItems() {

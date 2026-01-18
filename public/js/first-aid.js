@@ -1,37 +1,7 @@
 const API_URL = window.location.origin + '/api';
 
-let currentUserId = null;
-let completedTopics = {};
-
-async function syncCompletedTopicsWithDatabase() {
-  const token = localStorage.getItem('y-safe-token');
-  if (!token) return false;
-  
-  try {
-    const response = await fetch(`${API_URL}/lesson-progress`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!response.ok) return false;
-    
-    const data = await response.json();
-    const dbProgress = data.progress || {};
-    
-    completedTopics = {};
-    dbProgress.forEach(lesson => {
-      if (lesson.completed) {
-        completedTopics[lesson.lesson_id] = true;
-      }
-    });
-    
-    localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
-    return true;
-  } catch (e) {
-    console.error('Error syncing completed topics:', e);
-    return false;
-  }
-}
-
 // Track completed topics
+let completedTopics = {};
 try {
   completedTopics = JSON.parse(localStorage.getItem('y-safe-completed-topics') || '{}');
 } catch (e) {
@@ -94,21 +64,17 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     console.log('DOM loaded, setting up first aid page...');
     
-    async function initializePage() {
-      await syncCompletedTopicsWithDatabase();
-      
-      setupModal();
-      
-      setupLessonCards();
-      
-      setupBackButton();
-      updateQuizButton();
-      updateCompletedTopics();
-      
-      console.log('First aid page loaded successfully');
-    }
+    // Set up modal first
+    setupModal();
     
-    initializePage();
+    // Then set up lesson cards
+    setupLessonCards();
+    
+    setupBackButton();
+    updateQuizButton();
+    updateCompletedTopics();
+    
+    console.log('First aid page loaded successfully');
   } catch (error) {
     console.error('Error initializing first aid page:', error);
   }
@@ -559,30 +525,9 @@ function setupModal() {
   });
 }
 
-async function markTopicCompleted() {
+function markTopicCompleted() {
   const lessonId = getCurrentLessonId();
   if (!lessonId || completedTopics[lessonId]) return;
-  
-  const token = localStorage.getItem('y-safe-token');
-  if (token) {
-    try {
-      const response = await fetch(`${API_URL}/lesson-progress`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          lessonId: lessonId,
-          completed: true
-        })
-      });
-      const data = await response.json();
-      console.log('Lesson progress saved:', data);
-    } catch (error) {
-      console.error('Error saving lesson progress:', error);
-    }
-  }
   
   completedTopics[lessonId] = true;
   localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
@@ -768,20 +713,11 @@ function showResults() {
 }
 
 function saveQuizProgress(quizId, score, totalQuestions) {
-  console.log('Saving quiz progress:', { quizId, score, totalQuestions });
-  
-  const token = localStorage.getItem('y-safe-token');
-  if (!token) {
-    console.error('No token found, cannot save quiz progress');
-    alert('Please login to save your quiz progress');
-    return;
-  }
-
+  // Token no longer needed for API calls
   fetch(`${API_URL}/quiz-progress`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
       quizType: 'first-aid',
@@ -790,21 +726,11 @@ function saveQuizProgress(quizId, score, totalQuestions) {
       totalQuestions
     })
   })
-  .then(response => {
-    console.log('Response status:', response.status);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  })
+  .then(response => response.json())
   .then(data => {
-    console.log('Quiz progress saved successfully:', data);
-    if (data.success) {
-      console.log('Quiz saved to database');
-    }
+    console.log('Quiz progress saved:', data);
   })
   .catch(error => {
     console.error('Error saving quiz progress:', error);
-    alert('Failed to save quiz progress. Please try again.');
   });
 }
