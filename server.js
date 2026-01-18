@@ -59,6 +59,11 @@ app.use(express.static('public', {
     }
 }));
 
+// Root route - serve the public/index.html as landing page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // Lightweight input validation placeholder (to be expanded with a proper lib in Phase 0)
 
 const db = new sqlite3.Database(DATABASE_PATH, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
