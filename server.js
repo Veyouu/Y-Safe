@@ -59,9 +59,18 @@ app.use(express.static('public', {
     }
 }));
 
-// Root route - serve the public/index.html as landing page
+// Root route - serve landing page
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'landing.html'));
+});
+
+// Legacy routes for compatibility
+app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/videos', (req, res) => {
+    res.sendFile(path.join(__dirname, 'landing.html'));
 });
 
 // Lightweight input validation placeholder (to be expanded with a proper lib in Phase 0)

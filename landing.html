@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y-SAFE - Essential First Aid & Safety Awareness | ELIAS A. SALVADOR NATIONAL HIGH SCHOOL</title>
+    <meta name="description" content="Learn essential first aid skills and safety awareness. Interactive lessons on CPR, burns, choking, wounds, fractures, fire safety, natural disasters, road safety, and more.">
+    <meta name="keywords" content="first aid, CPR, safety, emergency, medical, school education, Y-SAFE, Elias Salvador National High School">
+    <meta name="author" content="ELIAS A. SALVADOR NATIONAL HIGH SCHOOL">
+    <meta name="robots" content="index, follow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px 0;
+            margin: 20px 0;
+        }
+        
+        .hero-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .hero-description {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .cta-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .cta-button.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 15px;
+            }
+            
+            .cta-container {
+                flex-direction: column;
+            }
+            
+            .cta-button {
+                width: 100%;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Y-SAFE</h1>
+            <p class="hero-description">Essential First Aid & Safety Awareness for ELIAS A. SALVADOR NATIONAL HIGH SCHOOL</p>
+            <p class="hero-description">Learn life-saving skills with interactive lessons, videos, and quizzes on CPR, burns, choking, wounds, fractures, fire safety, natural disasters, and more.</p>
+            
+            <div class="cta-container">
+                <a href="dashboard.html" class="cta-button primary">
+                    Get Started Learning
+                </a>
+                <a href="videos-by-topic.html" class="cta-button secondary">
+                    Watch Video Tutorials
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Check if user is already logged in and redirect appropriately
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('y-safe-token');
+        if (token) {
+            // User is logged in, redirect to dashboard
+            window.location.href = 'dashboard.html';
+        }
+    });
+</script>
+</body>
+</html>
