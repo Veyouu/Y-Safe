@@ -182,6 +182,99 @@ const lessons = {
             </ul>
         `,
         quiz: []
+    },
+    electrical_safety: {
+        title: 'Electrical Safety',
+        content: `
+            <h3>Electrical Safety</h3>
+            <p>Electrical safety prevents accidents and injuries caused by electricity.</p>
+            
+            <h4>Do's</h4>
+            <ul>
+                <li>Do keep electrical appliances away from water.</li>
+                <li>Do use proper electrical cords and extension cords.</li>
+                <li>Do check for damaged wires before using appliances.</li>
+                <li>Do turn off electricity before repairing electrical items.</li>
+                <li>Do use circuit breakers and fuses correctly.</li>
+                <li>Do keep flammable materials away from electrical sources.</li>
+                <li>Do teach children about electrical safety.</li>
+                <li>Do call a professional for major electrical repairs.</li>
+            </ul>
+            
+            <h4>Don'ts</h4>
+            <ul>
+                <li>Don't touch electrical items with wet hands.</li>
+                <li>Don't overload electrical outlets.</li>
+                <li>Don't use damaged electrical cords.</li>
+                <li>Don't attempt electrical repairs without proper knowledge.</li>
+                <li>Don't use electrical appliances near water sources.</li>
+                <li>Don't ignore burning smells from electrical items.</li>
+                <li>Don't put metal objects in electrical outlets.</li>
+            </ul>
+        `,
+        quiz: []
+    },
+    water_safety: {
+        title: 'Water Safety',
+        content: `
+            <h3>Water Safety</h3>
+            <p>Water safety prevents drowning and water-related accidents.</p>
+            
+            <h4>Do's</h4>
+            <ul>
+                <li>Do learn how to swim if you frequently go near water.</li>
+                <li>Do wear life jackets when boating or in deep water.</li>
+                <li>Do supervise children near water at all times.</li>
+                <li>Do check water depth before diving or jumping.</li>
+                <li>Do learn basic rescue techniques.</li>
+                <li>Do follow posted warning signs near water bodies.</li>
+                <li>Do swim with a buddy when possible.</li>
+                <li>Do learn CPR and first aid for water emergencies.</li>
+            </ul>
+            
+            <h4>Don'ts</h4>
+            <ul>
+                <li>Don't swim alone in unfamiliar areas.</li>
+                <li>Don't swim during bad weather or storms.</li>
+                <li>Don't dive in shallow or unknown waters.</li>
+                <li>Don't ignore warning signs or barriers.</li>
+                <li>Don't consume alcohol before swimming.</li>
+                <li>Don't overestimate your swimming ability.</li>
+                <li>Don't leave children unattended near water.</li>
+            </ul>
+        `,
+        quiz: []
+    },
+    road_safety: {
+        title: 'Road Safety',
+        content: `
+            <h3>Road Safety</h3>
+            <p>Road safety prevents accidents and injuries on streets and highways.</p>
+            
+            <h4>Do's</h4>
+            <ul>
+                <li>Do follow traffic rules and signs at all times.</li>
+                <li>Do use pedestrian crossings when walking.</li>
+                <li>Do wear seatbelts when in vehicles.</li>
+                <li>Do wear helmets when riding motorcycles or bicycles.</li>
+                <li>Do check both ways before crossing streets.</li>
+                <li>Do use appropriate signals when turning.</li>
+                <li>Do maintain safe distance from other vehicles.</li>
+                <li>Do avoid using mobile phones while driving or walking.</li>
+            </ul>
+            
+            <h4>Don'ts</h4>
+            <ul>
+                <li>Don't jaywalk or cross roads illegally.</li>
+                <li>Don't drink and drive.</li>
+                <li>Don't exceed speed limits.</li>
+                <li>Don't use mobile phones while driving.</li>
+                <li>Don't ignore traffic signals and signs.</li>
+                <li>Don't drive when tired or sleepy.</li>
+                <li>Don't overload vehicles beyond capacity.</li>
+            </ul>
+        `,
+        quiz: []
     }
 };
 
@@ -212,6 +305,26 @@ const mainLessonQuiz = {
             {
                 question: 'Earthquakes may happen without warning, but there are signs that can alert people. Which of the following may indicate an approaching earthquake?',
                 options: ['Heavy rain', 'Strong wind', 'Unusual ground movement or rumbling', 'Brownout'],
+                correct: 2
+            },
+            {
+                question: 'Electrical accidents can cause serious injuries. Which action helps prevent electrical hazards at home?',
+                options: ['Using electrical devices with wet hands', 'Overloading power outlets with many devices', 'Keeping appliances away from water sources', 'Ignoring damaged electrical cords'],
+                correct: 2
+            },
+            {
+                question: 'Water safety is important for preventing drowning. What should you always do when participating in water activities?',
+                options: ['Swim alone to practice freely', 'Wear appropriate life jackets when needed', 'Ignore depth warnings', 'Consume alcohol before swimming'],
+                correct: 1
+            },
+            {
+                question: 'Road safety rules help prevent accidents. Which practice is most important for pedestrian safety?',
+                options: ['Crossing streets anywhere convenient', 'Using designated pedestrian crossings', 'Walking while using mobile phone', 'Ignoring traffic signals to save time'],
+                correct: 1
+            },
+            {
+                question: 'During typhoon season, preparedness is crucial. What should families do to stay safe during strong typhoons?',
+                options: ['Wait until flooding starts before evacuating', 'Ignore weather warnings if they seem exaggerated', 'Prepare emergency kits and follow evacuation orders', 'Stay in weak structures to protect belongings'],
                 correct: 2
             }
         ]

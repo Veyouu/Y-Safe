@@ -561,7 +561,6 @@ function setupModal() {
       // Close all modals
       document.querySelectorAll('.modal').forEach(modal => {
         modal.classList.remove('active');
-        modal.style.display = 'none';
       });
       document.body.style.overflow = 'auto';
     });
