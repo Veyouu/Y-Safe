@@ -278,14 +278,14 @@ function openLesson(lessonId) {
 
     modalTitle.textContent = lesson.title;
     modalBody.innerHTML = lesson.content;
-    modal.style.display = 'flex';
+    modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
 // Close all modals
 function closeAllModals() {
     document.querySelectorAll('.modal').forEach(modal => {
-        modal.style.display = 'none';
+        modal.classList.remove('active');
     });
     document.body.style.overflow = 'auto';
 }
@@ -382,7 +382,7 @@ function startMainQuiz(lessonType) {
 
     quizTitle.textContent = mainLessonQuiz[lessonType].title;
     totalQuestions.textContent = currentQuiz.length;
-    quizModal.style.display = 'flex';
+    quizModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
     showQuestion();
@@ -479,8 +479,8 @@ function showResults() {
 
     document.getElementById('resultMessage').textContent = message;
 
-    quizModal.style.display = 'none';
-    resultModal.style.display = 'flex';
+    quizModal.classList.remove('active');
+    resultModal.classList.add('active');
     document.body.style.overflow = 'hidden';
     
     saveQuizProgress('safety', correctAnswers, total);
