@@ -9,18 +9,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const API_URL = window.location.origin + '/api';
 
   function checkExistingUser() {
-    const token = localStorage.getItem('user-token');
-    const userInfo = localStorage.getItem('user-info');
+    const token = localStorage.getItem('y-safe-token');
+    const userInfo = localStorage.getItem('y-safe-user');
     
     if (token && userInfo) {
       try {
         const user = JSON.parse(userInfo);
         console.log('User already logged in:', user);
+        // Redirect to dashboard if user has valid token
         window.location.href = 'dashboard.html';
       } catch (error) {
         console.error('Error parsing saved user data:', error);
-        localStorage.removeItem('user-token');
-        localStorage.removeItem('user-info');
+        localStorage.removeItem('y-safe-token');
+        localStorage.removeItem('y-safe-user');
       }
     }
   }
@@ -36,22 +37,20 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleRegistration(e) {
     e.preventDefault();
     
-    const name = document.getElementById('userName').value.trim();
-    const section = document.getElementById('userSection').value.trim();
-    const nameError = document.getElementById('nameError');
-    const submitBtn = registrationForm.querySelector('button[type="submit"]');
-    const btnText = submitBtn.querySelector('.btn-text');
-    const btnLoader = submitBtn.querySelector('.btn-loader');
-
-    nameError.textContent = '';
-
-    if (!name) {
-      nameError.textContent = 'Please enter your name';
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const section = document.getElementById('section').value.trim();
+    const name = `${firstName} ${lastName}`.trim();
+    
+    if (!firstName || !lastName) {
+      alert('Please enter both first and last name');
       return;
     }
 
-    btnText.style.display = 'none';
-    btnLoader.style.display = 'inline';
+    const submitBtn = registrationForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Loading...';
+    submitBtn.disabled = true;
 
     fetch(`${API_URL}/register`, {
       method: 'POST',
@@ -67,8 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(response => response.json())
     .then(data => {
       if (data.token) {
-        localStorage.setItem('user-token', data.token);
-        localStorage.setItem('user-info', JSON.stringify(data.user));
+        localStorage.setItem('y-safe-token', data.token);
+        localStorage.setItem('y-safe-user', JSON.stringify(data.user));
         window.location.href = 'dashboard.html';
       } else {
         throw new Error(data.error || 'Registration failed');
@@ -76,13 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(error => {
       console.error('Registration error:', error);
-      nameError.textContent = error.message || 'Registration failed';
-      btnText.style.display = 'inline';
-      btnLoader.style.display = 'none';
+      alert(error.message || 'Registration failed');
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
     });
   }
 
   function handleGuestLogin() {
+    const originalText = guestBtn.textContent;
     guestBtn.textContent = 'Loading...';
     guestBtn.disabled = true;
 
@@ -92,16 +92,16 @@ document.addEventListener('DOMContentLoaded', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
-        name: 'Guest', 
-        section: '', 
+        name: 'Guest User', 
+        section: 'N/A', 
         isGuest: true 
       })
     })
     .then(response => response.json())
     .then(data => {
       if (data.token) {
-        localStorage.setItem('user-token', data.token);
-        localStorage.setItem('user-info', JSON.stringify(data.user));
+        localStorage.setItem('y-safe-token', data.token);
+        localStorage.setItem('y-safe-user', JSON.stringify(data.user));
         window.location.href = 'dashboard.html';
       } else {
         throw new Error(data.error || 'Guest login failed');
@@ -109,7 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(error => {
       console.error('Guest login error:', error);
-      guestBtn.textContent = 'Continue as Guest';
+      alert(error.message || 'Guest login failed');
+      guestBtn.textContent = originalText;
       guestBtn.disabled = false;
     });
   }

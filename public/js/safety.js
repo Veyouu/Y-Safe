@@ -1,5 +1,5 @@
 // Safety Module - Clean and Organized
-const API_URL = window.location.origin;
+const API_URL = window.location.origin + '/api';
 
 let currentUserId = null;
 let completedTopics = {};

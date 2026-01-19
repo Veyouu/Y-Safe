@@ -1,5 +1,5 @@
 // Shared Utilities for Y-SAFE Application
-const API_URL = window.location.origin;
+const API_URL = window.location.origin + '/api';
 
 // Common database operations
 export async function syncCompletedTopicsWithDatabase() {

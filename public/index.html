@@ -12,81 +12,225 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .landing-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .hero-image-section {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+        
+        .hero-content {
+            text-align: center;
+            color: white;
+            max-width: 800px;
+        }
+        
+        .hero-logo {
+            margin-bottom: 30px;
+        }
+        
+        .hero-logo img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .hero-school {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+        
+        .hero-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+        
+        .form-section {
+            background: white;
+            padding: 50px 20px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .form-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .hero-school {
+                font-size: 1rem;
+            }
+            
+            .hero-description {
+                font-size: 1rem;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <div id="app">
-        <div class="login-container">
-            <div class="login-card">
-                <div class="logo-section">
-                    <img src="images/LOGO.png?v=2" alt="Y-SAFE Logo" class="logo-image">
-                    <h1 class="site-title">Y-SAFE</h1>
-                    <p class="site-subtitle">Essential First Aid & Safety Awareness</p>
-                    <p class="school-name">ELIAS A. SALVADOR NATIONAL HIGH SCHOOL</p>
+    <div class="landing-container">
+        <div class="hero-image-section">
+            <div class="hero-content">
+                <div class="hero-logo">
+                    <img src="images/LOGO.png?v=2" alt="Y-SAFE Logo">
                 </div>
-
-                <div class="welcome-message">
-                    <h2>Welcome to Y-SAFE!</h2>
-                    <p>We're glad you're here. This website is designed to help you learn simple first aid skills, understand safety awareness, and feel more confident in handling emergency situations.</p>
-                </div>
-
-                <form id="registrationForm" class="login-form">
+                <h1 class="hero-title">Y-SAFE</h1>
+                <p class="hero-subtitle">Essential First Aid & Safety Awareness</p>
+                <p class="hero-school">ELIAS A. SALVADOR NATIONAL HIGH SCHOOL</p>
+                <p class="hero-description">We're glad you're here. This website is designed to help you learn simple first aid skills, understand safety awareness, and feel more confident in handling emergency situations.</p>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-container">
+                <h2 class="form-title">Enter Your Information</h2>
+                <form id="userForm">
                     <div class="form-group">
-                        <label for="userName">Your Name *</label>
-                        <input type="text" id="userName" name="userName" placeholder="Enter your name" required>
-                        <span class="error-message" id="nameError"></span>
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required>
                     </div>
-
+                    
                     <div class="form-group">
-                        <label for="userSection">Section <span class="optional">(optional)</span></label>
-                        <input type="text" id="userSection" name="userSection" placeholder="Enter your section">
-                        <span class="error-message" id="sectionError"></span>
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required>
                     </div>
-
-                    <button type="submit" class="btn btn-primary">
-                        <span class="btn-text">Start Learning</span>
-                        <span class="btn-loader" style="display: none;">Loading...</span>
-                    </button>
-
-                    <button type="button" id="guestBtn" class="btn btn-secondary">
-                        Continue as Guest
-                    </button>
+                    
+                    <div class="form-group">
+                        <label for="section">Section</label>
+                        <input type="text" id="section" name="section" required>
+                    </div>
+                    
+                    <div class="button-container">
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                        <button type="button" class="btn btn-secondary" id="guestBtn">Continue as Guest</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
     <script src="js/index.js"></script>
-    <script>
-        // Add some CSS for error states
-        const style = document.createElement('style');
-        style.textContent = `
-            .login-form input.error {
-                border-color: var(--emergency-red) !important;
-                box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.2) !important;
-            }
-
-            .login-form input.error:focus {
-                border-color: var(--emergency-red) !important;
-                box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.2) !important;
-            }
-
-            .btn:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-            }
-
-            .btn-loader {
-                animation: pulse 1.5s ease-in-out infinite alternate;
-            }
-
-            @keyframes pulse {
-                from { opacity: 1; }
-                to { opacity: 0.6; }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
 </body>
-
 </html>

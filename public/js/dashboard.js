@@ -67,7 +67,7 @@ function loadDashboard() {
     console.error('Error fetching user data:', error);
     localStorage.removeItem('y-safe-token');
     localStorage.removeItem('y-safe-user');
-    window.location.href = 'index.html';
+    window.location.href = '/';
   });
 }
 
@@ -155,10 +155,17 @@ function setupLogout() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
+      // Clear ALL storage items
       localStorage.removeItem('y-safe-token');
       localStorage.removeItem('y-safe-user');
       localStorage.removeItem('y-safe-completed-topics');
-      window.location.href = 'index.html';
+      localStorage.removeItem('y-safe-banner-closed');
+      
+      // Clear any session storage
+      sessionStorage.clear();
+      
+      console.log('User logged out successfully');
+      window.location.href = '/';
     });
   }
 }
