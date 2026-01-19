@@ -4,26 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
   loadDashboard();
   setupFeatureCardListeners();
   setupAdminLogin();
-  setupLogout();
   setupTutorial();
-  setupWelcomeBanner();
 });
-
-function setupWelcomeBanner() {
-  const closeBtn = document.getElementById('closeBanner');
-  const welcomeBanner = document.getElementById('welcomeBanner');
-
-  closeBtn.addEventListener('click', () => {
-    welcomeBanner.style.display = 'none';
-    // Save preference to localStorage
-    localStorage.setItem('y-safe-banner-closed', 'true');
-  });
-
-  // Check if user has already closed banner
-  if (localStorage.getItem('y-safe-banner-closed') === 'true') {
-    welcomeBanner.style.display = 'none';
-  }
-}
 
 function setupTutorial() {
   const closeBtn = document.getElementById('closeTutorial');
@@ -35,40 +17,53 @@ function setupTutorial() {
     localStorage.setItem('y-safe-tutorial-closed', 'true');
   });
 
-  // Check if user has already closed tutorial - only hide if they have taken quizzes
-  const quizzesTaken = parseInt(document.getElementById('quizzesTaken')?.textContent || '0');
-  if (localStorage.getItem('y-safe-tutorial-closed') === 'true' && quizzesTaken > 0) {
+  // Check if user has already closed tutorial
+  if (localStorage.getItem('y-safe-tutorial-closed') === 'true') {
     tutorialSection.style.display = 'none';
   }
 }
 
 function loadDashboard() {
+  // Get user data from localStorage (from login.js)
+  const userStr = localStorage.getItem('y-safe-user');
   const token = localStorage.getItem('y-safe-token');
-  if (!token) {
-    document.getElementById('userName').textContent = 'Guest';
-    document.getElementById('welcomeMessage').textContent = 'Welcome to Y-SAFE!';
-    document.getElementById('lessonsCompleted').textContent = '0';
-    document.getElementById('quizzesTaken').textContent = '0';
-    document.getElementById('averageScore').textContent = '0%';
-    return;
-  }
-  fetch(`${API_URL}/user`, {
-    headers: {
-      'Authorization': `Bearer ${token}`
+  
+  let userName = 'Guest';
+  let userSection = '';
+  let isGuest = true;
+  
+  if (userStr && token) {
+    try {
+      const user = JSON.parse(userStr);
+      userName = user.name || 'Guest';
+      userSection = user.section || '';
+      isGuest = user.isGuest || false;
+    } catch (e) {
+      console.error('Error parsing user data:', e);
     }
-  })
-  .then(response => response.json())
-  .then(data => {
-    document.getElementById('userName').textContent = data.user.name;
-    document.getElementById('welcomeMessage').textContent = `Welcome, ${data.user.name}!`;
+  }
+  
+  // Set user name in header
+  document.getElementById('userName').textContent = userName;
+  
+  // Set welcome message
+  if (isGuest) {
+    document.getElementById('welcomeMessage').textContent = 'Welcome to Y-SAFE!';
+  } else if (userSection) {
+    document.getElementById('welcomeMessage').textContent = `Welcome to Y-SAFE, ${userName} from ${userSection}!`;
+  } else {
+    document.getElementById('welcomeMessage').textContent = `Welcome to Y-SAFE, ${userName}!`;
+  }
+  
+  // Set default progress to 0 (will be updated by API if available)
+  document.getElementById('lessonsCompleted').textContent = '0';
+  document.getElementById('quizzesTaken').textContent = '0';
+  document.getElementById('averageScore').textContent = '0%';
+  
+  // If we have a token, try to fetch progress from API
+  if (token) {
     fetchProgress(token);
-  })
-  .catch(error => {
-    console.error('Error fetching user data:', error);
-    localStorage.removeItem('y-safe-token');
-    localStorage.removeItem('y-safe-user');
-    window.location.href = '/';
-  });
+  }
 }
 
 function fetchProgress(token) {
@@ -105,7 +100,7 @@ function fetchLessonProgress(token) {
 }
 
 function fetchQuizProgress(token) {
-  fetch(`${API_URL}/quiz-progress`, {
+  fetch(`${API_URL}/quiz-progress/first-aid`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -149,23 +144,4 @@ function setupAdminLogin() {
   adminBtn.addEventListener('click', () => {
     window.location.href = 'admin-login.html';
   });
-}
-
-function setupLogout() {
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      // Clear ALL storage items
-      localStorage.removeItem('y-safe-token');
-      localStorage.removeItem('y-safe-user');
-      localStorage.removeItem('y-safe-completed-topics');
-      localStorage.removeItem('y-safe-banner-closed');
-      
-      // Clear any session storage
-      sessionStorage.clear();
-      
-      console.log('User logged out successfully');
-      window.location.href = '/';
-    });
-  }
 }

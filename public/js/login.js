@@ -38,8 +38,6 @@ function handleLogin(e) {
   .then(data => {
     localStorage.setItem('y-safe-token', data.token);
     localStorage.setItem('y-safe-user', JSON.stringify(data.user));
-    localStorage.removeItem('y-safe-completed-topics');
-    localStorage.removeItem('y-safe-tutorial-closed');
     window.location.href = 'dashboard.html';
   })
   .catch(error => {
@@ -77,8 +75,6 @@ function handleGuestLogin() {
   .then(data => {
     localStorage.setItem('y-safe-token', data.token);
     localStorage.setItem('y-safe-user', JSON.stringify(data.user));
-    localStorage.removeItem('y-safe-completed-topics');
-    localStorage.removeItem('y-safe-tutorial-closed');
     window.location.href = 'dashboard.html';
   })
   .catch(error => {

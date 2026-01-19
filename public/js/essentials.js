@@ -1,37 +1,7 @@
 const API_URL = window.location.origin + '/api';
 
-let currentUserId = null;
-let completedTopics = {};
-
-async function syncCompletedTopicsWithDatabase() {
-  const token = localStorage.getItem('y-safe-token');
-  if (!token) return false;
-  
-  try {
-    const response = await fetch(`${API_URL}/lesson-progress`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!response.ok) return false;
-    
-    const data = await response.json();
-    const dbProgress = data.progress || {};
-    
-    completedTopics = {};
-    dbProgress.forEach(lesson => {
-      if (lesson.completed) {
-        completedTopics[lesson.lesson_id] = true;
-      }
-    });
-    
-    localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
-    return true;
-  } catch (e) {
-    console.error('Error syncing completed topics:', e);
-    return false;
-  }
-}
-
 // Track completed topics
+let completedTopics = {};
 try {
   completedTopics = JSON.parse(localStorage.getItem('y-safe-completed-topics') || '{}');
 } catch (e) {
@@ -444,30 +414,13 @@ let correctAnswers = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
   try {
-    async function initializePage() {
-      await syncCompletedTopicsWithDatabase();
-      
-      setupBackButton();
-      setupEssentialItems();
-      setupModal();
-      updateQuizButton();
-      updateCompletedTopics();
-      
-      // Universal fallback for dashboard button
-      document.addEventListener('click', (e) => {
-        const target = e.target;
-        if (target.id === 'backBtn' || target.classList.contains('btn-back') || 
-            target.closest('#backBtn') || target.closest('.btn-back')) {
-          e.preventDefault();
-          console.log('Universal dashboard button handler triggered');
-          window.location.href = 'dashboard.html';
-        }
-      });
-      
-      console.log('Essentials page loaded successfully');
-    }
-    
-    initializePage();
+    // checkAuth() removed - no longer needed
+    setupBackButton();
+    setupEssentialItems();
+    setupModal();
+    updateQuizButton();
+    updateCompletedTopics();
+    console.log('Essentials page loaded successfully');
   } catch (error) {
     console.error('Error initializing essentials page:', error);
   }
@@ -476,27 +429,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // Authentication check removed - no longer needed
 
 function setupBackButton() {
-  const backBtn = document.getElementById('backBtn');
-  if (backBtn) {
-    // Remove any existing event listeners
-    backBtn.replaceWith(backBtn.cloneNode(true));
-    const newBackBtn = document.getElementById('backBtn');
-    
-    newBackBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log('Dashboard button clicked - going to dashboard');
-      window.location.href = 'dashboard.html';
-    });
-    
-    // Also add onclick as backup
-    newBackBtn.onclick = function(e) {
-      e.preventDefault();
-      console.log('Dashboard onclick triggered - going to dashboard');
-      window.location.href = 'dashboard.html';
-    };
-  } else {
-    console.error('Back button not found!');
-  }
+  document.getElementById('backBtn').addEventListener('click', () => {
+    window.location.href = 'dashboard.html';
+  });
 }
 
 function setupEssentialItems() {
@@ -561,6 +496,7 @@ function setupModal() {
       // Close all modals
       document.querySelectorAll('.modal').forEach(modal => {
         modal.classList.remove('active');
+        modal.style.display = 'none';
       });
       document.body.style.overflow = 'auto';
     });
@@ -666,30 +602,9 @@ function selectOption(index, element) {
   document.getElementById('nextQuestionBtn').disabled = false;
 }
 
-async function markTopicCompleted() {
+function markTopicCompleted() {
   const itemId = getCurrentLessonId();
   if (!itemId || completedTopics[itemId]) return;
-  
-  const token = localStorage.getItem('y-safe-token');
-  if (token) {
-    try {
-      const response = await fetch(`${API_URL}/lesson-progress`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          lessonId: itemId,
-          completed: true
-        })
-      });
-      const data = await response.json();
-      console.log('Lesson progress saved:', data);
-    } catch (error) {
-      console.error('Error saving lesson progress:', error);
-    }
-  }
   
   completedTopics[itemId] = true;
   localStorage.setItem('y-safe-completed-topics', JSON.stringify(completedTopics));
@@ -797,20 +712,11 @@ function showResults() {
 }
 
 function saveQuizProgress(quizId, score, totalQuestions) {
-  console.log('Saving quiz progress:', { quizId, score, totalQuestions });
-  
-  const token = localStorage.getItem('y-safe-token');
-  if (!token) {
-    console.error('No token found, cannot save quiz progress');
-    alert('Please login to save your quiz progress');
-    return;
-  }
-
+  // Token no longer needed for API calls
   fetch(`${API_URL}/quiz-progress`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
       quizType: 'essentials',
@@ -819,21 +725,11 @@ function saveQuizProgress(quizId, score, totalQuestions) {
       totalQuestions
     })
   })
-  .then(response => {
-    console.log('Response status:', response.status);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  })
+  .then(response => response.json())
   .then(data => {
-    console.log('Quiz progress saved successfully:', data);
-    if (data.success) {
-      console.log('Quiz saved to database');
-    }
+    console.log('Quiz progress saved:', data);
   })
   .catch(error => {
     console.error('Error saving quiz progress:', error);
-    alert('Failed to save quiz progress. Please try again.');
   });
 }

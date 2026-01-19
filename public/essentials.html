@@ -16,7 +16,7 @@
         <img src="images/LOGO.png?v=2" alt="Y-SAFE Logo" class="logo-image-small">
         <h1 class="site-title-small">Y-SAFE</h1>
       </div>
-      <button class="btn-back" id="backBtn" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+      <button class="btn-back" id="backBtn" onclick="window.location.href='dashboard.html'; return false;">← Dashboard</button>
     </div>
   </header>
 
@@ -179,10 +179,9 @@
     </div>
   </div>
 
-<script src="js/essentials.js"></script>
-<script>
-  // Essentials Module - Embedded Script
-  console.log('Essentials page - embedded script loaded');
+  <script>
+    // Embedded JavaScript to fix button issues
+    console.log('Essentials page - embedded script loaded');
     
     // Track completed topics
     let completedTopics = {};

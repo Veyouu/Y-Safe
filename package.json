@@ -6,8 +6,7 @@
   "scripts": {
     "postinstall": "npm rebuild sqlite3 || exit 0",
     "start": "node server.js",
-    "dev": "node server.js",
-    "hash:admin": "node generate-admin-hash.js"
+    "dev": "node server.js"
   },
   "keywords": ["first-aid", "safety", "education", "school"],
   "author": "Y-SAFE Team",

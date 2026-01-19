@@ -12,10 +12,10 @@ try {
 // YouTube video IDs for each lesson
 const lessonVideos = {
   'bandage-parts': 'A7UIePi5ngM',
-  'bandage-folds': 'N-om6XQHgQI', 
+  'bandage-folds': '4NnhldZISuQ', 
   'square-knot': '40TQ7qFwEfs',
-  'head-wound': 'xrr9JZTEwf0',
-  'forearm-wound': 'CT9GvWkadCI',
+  'head-wound': 'PzZPxMwozE4',
+  'forearm-wound': 'PzZPxMwozE4',
   'hand-burn': 'x4QndeNf85A',
   'arm-sling': 'PzZPxMwozE4',
   'face-burn': '4NnhldZISuQ'
@@ -486,6 +486,7 @@ function openLesson(lessonId) {
     }
   }
 
+  modal.style.display = 'block';
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
   
@@ -501,6 +502,7 @@ function setupModal() {
       // Close all modals
       document.querySelectorAll('.modal').forEach(modal => {
         modal.classList.remove('active');
+        modal.style.display = 'none';
       });
       document.body.style.overflow = 'auto';
       
