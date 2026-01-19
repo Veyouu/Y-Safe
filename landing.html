@@ -111,10 +111,15 @@
     <script>
     // Check if user is already logged in and redirect appropriately
     document.addEventListener('DOMContentLoaded', () => {
+        // Clear any problematic states first
+        localStorage.removeItem('y-safe-banner-closed');
+        
         const token = localStorage.getItem('y-safe-token');
         if (token) {
-            // User is logged in, redirect to dashboard
+            console.log('User is logged in, redirecting to dashboard');
             window.location.href = 'dashboard.html';
+        } else {
+            console.log('User is not logged in, staying on landing page');
         }
     });
 </script>
