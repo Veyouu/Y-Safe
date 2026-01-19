@@ -13,115 +13,239 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .hero-section {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .landing-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .hero-image-section {
+            flex: 1;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 80px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+        
+        .hero-image-placeholder {
             text-align: center;
-            border-radius: 0 0 20px 20px 0;
-            margin: 20px 0;
+            color: white;
         }
         
-        .hero-content {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .hero-title {
-            font-size: 3.5rem;
+        .hero-image-placeholder h1 {
+            font-size: 4rem;
             font-weight: 700;
             margin-bottom: 20px;
-            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
-        .hero-description {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
+        .hero-image-placeholder p {
+            font-size: 1.3rem;
             opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
             line-height: 1.6;
         }
         
-        .cta-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
+        .form-section {
+            background: white;
+            padding: 40px 20px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
         }
         
-        .cta-button {
-            padding: 15px 30px;
-            font-size: 1.1rem;
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .form-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1rem;
+            font-weight: 500;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 500;
             transition: all 0.3s ease;
         }
         
-        .cta-button.primary {
-            background: var(--primary-color);
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
         
-        .cta-button.secondary {
+        .btn-secondary {
             background: transparent;
-            color: white;
-            border: 2px solid white;
+            color: #667eea;
+            border: 2px solid #667eea;
         }
         
-        .cta-button:hover {
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
         @media (max-width: 768px) {
-            .hero-section {
-                padding: 60px 15px;
+            .hero-image-placeholder h1 {
+                font-size: 2.5rem;
             }
             
-            .cta-container {
+            .hero-image-placeholder p {
+                font-size: 1.1rem;
+            }
+            
+            .button-container {
                 flex-direction: column;
             }
             
-            .cta-button {
+            .btn {
                 width: 100%;
-                padding: 12px 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="hero-section">
-        <div class="hero-content">
-            <h1 class="hero-title">Y-SAFE</h1>
-            <p class="hero-description">Essential First Aid & Safety Awareness for ELIAS A. SALVADOR NATIONAL HIGH SCHOOL</p>
-            <p class="hero-description">Learn life-saving skills with interactive lessons, videos, and quizzes on CPR, burns, choking, wounds, fractures, fire safety, natural disasters, and more.</p>
-            
-            <div class="cta-container">
-                <a href="dashboard.html" class="cta-button primary">
-                    Get Started Learning
-                </a>
-                <a href="videos-by-topic.html" class="cta-button secondary">
-                    Watch Video Tutorials
-                </a>
+    <div class="landing-container">
+        <div class="hero-image-section">
+            <div class="hero-image-placeholder">
+                <h1>Y-SAFE</h1>
+                <p>Essential First Aid & Safety Awareness for ELIAS A. SALVADOR NATIONAL HIGH SCHOOL</p>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-container">
+                <h2 class="form-title">Enter Your Information</h2>
+                <form id="userForm">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="section">Section</label>
+                        <input type="text" id="section" name="section" required>
+                    </div>
+                    
+                    <div class="button-container">
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                        <button type="button" class="btn btn-secondary" id="guestBtn">Continue as Guest</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
     <script>
-    // Check if user is already logged in and redirect appropriately
     document.addEventListener('DOMContentLoaded', () => {
         // Clear any problematic states first
         localStorage.removeItem('y-safe-banner-closed');
         
+        const userForm = document.getElementById('userForm');
+        const guestBtn = document.getElementById('guestBtn');
+        
+        // Handle form submission (Sign In)
+        userForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(userForm);
+            const userData = {
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                section: formData.get('section'),
+                isGuest: false
+            };
+            
+            // Store user data
+            localStorage.setItem('y-safe-user', JSON.stringify(userData));
+            localStorage.setItem('y-safe-token', 'signed-in');
+            
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        });
+        
+        // Handle guest access
+        guestBtn.addEventListener('click', () => {
+            const userData = {
+                firstName: 'Guest',
+                lastName: 'User',
+                section: 'N/A',
+                isGuest: true
+            };
+            
+            // Store guest data
+            localStorage.setItem('y-safe-user', JSON.stringify(userData));
+            localStorage.setItem('y-safe-token', 'guest');
+            
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        });
+        
+        // Check if user is already logged in
         const token = localStorage.getItem('y-safe-token');
         if (token) {
-            console.log('User is logged in, redirecting to dashboard');
+            console.log('User is already logged in, redirecting to dashboard');
             window.location.href = 'dashboard.html';
-        } else {
-            console.log('User is not logged in, staying on landing page');
         }
     });
-</script>
+    </script>
 </body>
 </html>
