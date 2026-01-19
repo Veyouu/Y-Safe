@@ -93,14 +93,27 @@ const db = new sqlite3.Database(DATABASE_PATH, sqlite3.OPEN_READWRITE | sqlite3.
 });
 
 function initializeDatabase() {
+  console.log('Initializing database...');
+  
+  // Create tables without dropping to preserve existing data
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     section TEXT,
     is_guest INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`, (err) => {
+    if (err) console.error('Error creating users table:', err);
+    else console.log('Users table ready');
+  });
+
+  db.run(`CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    section TEXT,
+    is_guest INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
-  
 
   db.run(`CREATE TABLE IF NOT EXISTS quiz_progress (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -111,8 +124,10 @@ function initializeDatabase() {
     total_questions INTEGER,
     completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
-  )`);
-  
+  )`, (err) => {
+    if (err) console.error('Error creating quiz_progress table:', err);
+    else console.log('Quiz_progress table ready');
+  });
 
   db.run(`CREATE TABLE IF NOT EXISTS lesson_progress (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -122,20 +137,31 @@ function initializeDatabase() {
     completed_at DATETIME,
     FOREIGN KEY (user_id) REFERENCES users(id),
     UNIQUE(user_id, lesson_id)
-  )`);
-  
+  )`, (err) => {
+    if (err) console.error('Error creating lesson_progress table:', err);
+    else console.log('Lesson_progress table ready');
+  });
+
+  console.log('Database initialization completed');
+}
 }
 
 app.post('/api/register', (req, res) => {
   const { name, section, isGuest } = req.body;
+  console.log('Registration request:', { name, section, isGuest });
+  
   // Basic input check
   if (typeof isGuest !== 'boolean') {
+    console.log('Invalid isGuest type:', typeof isGuest);
     return res.status(400).json({ error: 'Invalid request: isGuest required' });
   }
+  
   // For guests, name is optional
   if (!isGuest && (typeof name !== 'string' || name.trim() === '')) {
+    console.log('Missing name for registered user');
     return res.status(400).json({ error: 'Name is required for registered users' });
   }
+  
   // For guests, don't save to database
   if (isGuest) {
     const guestName = typeof name === 'string' && name.trim() !== '' ? name.trim() : 'Guest';
@@ -144,8 +170,10 @@ app.post('/api/register', (req, res) => {
       JWT_SECRET,
       { expiresIn: '7d' }
     );
+    console.log('Guest registration successful:', guestName);
     return res.json({ token, user: { id: null, name: guestName, section, isGuest: true } });
   }
+  
   // For registered users, save to database
   const stmt = db.prepare('INSERT INTO users (name, section, is_guest) VALUES (?, ?, ?)');
   stmt.run(name, section || null, 0, function(err) {
@@ -158,6 +186,7 @@ app.post('/api/register', (req, res) => {
       JWT_SECRET,
       { expiresIn: '7d' }
     );
+    console.log('User registration successful:', { id: this.lastID, name });
     res.json({ token, user: { id: this.lastID, name, section, isGuest: false } });
   });
 });
@@ -218,25 +247,38 @@ app.post('/api/login', (req, res) => {
 
 app.get('/api/user', (req, res) => {
   const header = req.headers.authorization;
-  if (!header) return res.json({ user: { name: 'Guest', isGuest: true } });
+  if (!header) {
+    console.log('No authorization header found');
+    return res.json({ user: { name: 'Guest', isGuest: true } });
+  }
+  
   const token = header.startsWith('Bearer ') ? header.slice(7) : header;
+  console.log('Fetching user with token:', token.substring(0, 20) + '...');
+  
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    if (!decoded.userId) return res.json({ user: { name: 'Guest', isGuest: true } });
+    console.log('Token decoded:', decoded);
+    
+    if (!decoded.userId) {
+      console.log('No userId in token - treating as guest');
+      return res.json({ user: { name: decoded.name || 'Guest', isGuest: true } });
+    }
+    
     db.get('SELECT * FROM users WHERE id = ?', [decoded.userId], (err, user) => {
       if (err) {
         console.error('Database error fetching user:', err);
-        return res.json({ user: { name: 'Guest', isGuest: true } });
+        return res.status(500).json({ error: 'Database error' });
       }
       if (!user) {
         console.error('User not found for ID:', decoded.userId);
         return res.json({ user: { name: 'Guest', isGuest: true } });
       }
+      console.log('User found:', { id: user.id, name: user.name });
       res.json({ user: { id: user.id, name: user.name, section: user.section, isGuest: !!user.is_guest } });
     });
   } catch (e) {
     console.error('Token verification error:', e);
-    res.json({ user: { name: 'Guest', isGuest: true } });
+    return res.json({ user: { name: 'Guest', isGuest: true } });
   }
 });
 
