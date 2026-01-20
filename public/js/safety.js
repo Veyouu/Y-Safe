@@ -43,20 +43,39 @@ const mainLessonQuiz = {
 };
 
 const lessons = {
-    fire: {
+fire: {
         title: 'Fire Safety',
         content: `
       <h3>Fire Safety</h3>
-      <p>Fire safety is important to prevent injuries and loss of life during fire incidents.</p>
+      <p>Fire safety is important to prevent injuries and loss of life during fire incidents. Knowing what to do and what not to do during a fire emergency can save lives.</p>
       
-      <h4>Basic Safety Tips:</h4>
+      <h4>Do's During Fire Emergencies:</h4>
       <ul>
-        <li>Keep flammable materials away from heat and open flames.</li>
-        <li>Do not overload electrical outlets or use damaged wires.</li>
-        <li>Turn off appliances when not in use.</li>
-        <li>Know the location of fire exits and fire extinguishers.</li>
-        <li>Stay calm during a fire and avoid using elevators.</li>
-        <li>If there is smoke, stay low and cover your nose and mouth with a cloth.</li>
+        <li>Do keep flammable materials away from heat, stoves, and open flames.</li>
+        <li>Do unplug appliances when not in use.</li>
+        <li>Do check electrical wires regularly for damage.</li>
+        <li>Do install smoke alarms and keep them working.</li>
+        <li>Do know fire exit routes in your home, school, or workplace.</li>
+        <li>Do keep a fire extinguisher in accessible areas.</li>
+        <li>Do stay calm and think clearly during a fire emergency.</li>
+        <li>Do crawl low if there is heavy smoke.</li>
+        <li>Do cover your nose and mouth with a wet cloth if possible.</li>
+        <li>Do help children, elderly, and PWDs during evacuation if safe to do so.</li>
+        <li>Do call emergency services once you are in a safe place.</li>
+      </ul>
+      
+      <h4>Don'ts During Fire Emergencies:</h4>
+      <ul>
+        <li>Don't overload electrical outlets or extension cords.</li>
+        <li>Don't use damaged wires or appliances.</li>
+        <li>Don't leave cooking unattended.</li>
+        <li>Don't play with matches, lighters, or candles.</li>
+        <li>Don't block fire exits or stairways.</li>
+        <li>Don't use elevators during a fire.</li>
+        <li>Don't panic or push others while evacuating.</li>
+        <li>Don't re-enter a burning building to get belongings.</li>
+        <li>Don't throw water on electrical or oil fires.</li>
+        <li>Don't hide in rooms—always move toward an exit if safe.</li>
       </ul>
     `,
         quiz: [{
@@ -86,19 +105,35 @@ const lessons = {
             }
         ]
     },
-    earthquake: {
+earthquake: {
         title: 'Earthquake Warning Signs',
         content: `
       <h3>Earthquake Warning Signs</h3>
-      <p>Earthquake warning signs help people prepare and respond quickly before and during shaking.</p>
+      <p>Earthquake warning signs help people prepare and respond quickly before and during shaking. Understanding the proper safety procedures can protect you during seismic events.</p>
       
-      <h4>Basic Safety Tips:</h4>
+      <h4>Do's During Earthquakes:</h4>
       <ul>
-        <li>Be alert to unusual ground movement or rumbling sounds.</li>
-        <li>Secure heavy objects and furniture to prevent falling.</li>
-        <li>Learn and practice the "Duck, Cover, and Hold" procedure.</li>
-        <li>Stay away from windows, shelves, and hanging objects.</li>
-        <li>After the shaking stops, move carefully to a safe area.</li>
+        <li>Do stay alert if you feel unusual ground movement or hear rumbling sounds.</li>
+        <li>Do secure heavy furniture, cabinets, and appliances to walls.</li>
+        <li>Do practice "Duck, Cover, and Hold" regularly at home and school.</li>
+        <li>Do stay indoors during shaking if you are already inside.</li>
+        <li>Do protect your head and neck using your arms or a pillow.</li>
+        <li>Do move to an open and safe area after the shaking stops.</li>
+        <li>Do check for injuries and help others if it is safe.</li>
+        <li>Do turn off gas, water, and electricity if there are signs of damage.</li>
+        <li>Do follow official announcements and emergency instructions.</li>
+      </ul>
+      
+      <h4>Don'ts During Earthquakes:</h4>
+      <ul>
+        <li>Don't panic or run while the ground is shaking.</li>
+        <li>Don't use elevators during or after an earthquake.</li>
+        <li>Don't stand near windows, mirrors, shelves, or hanging objects.</li>
+        <li>Don't go outside immediately during strong shaking.</li>
+        <li>Don't light matches or candles if you smell gas.</li>
+        <li>Don't spread rumors or false information.</li>
+        <li>Don't re-enter damaged buildings until authorities say it is safe.</li>
+        <li>Don't ignore aftershocks—they can be as dangerous as the first quake.</li>
       </ul>
     `,
         quiz: [{
@@ -128,19 +163,33 @@ const lessons = {
             }
         ]
     },
-    evacuation: {
+evacuation: {
         title: 'Importance of Evacuation Plans and Safe Areas for Typhoons',
         content: `
       <h3>Importance of Evacuation Plans and Safe Areas for Typhoons</h3>
-      <p>Evacuation plans and safe areas protect lives during strong typhoons and flooding.</p>
+      <p>Evacuation plans and safe areas protect lives during strong typhoons and flooding. Proper preparation and following safety procedures can ensure your survival during severe weather events.</p>
       
-      <h4>Basic Safety Tips:</h4>
+      <h4>Do's During Typhoon Evacuations:</h4>
       <ul>
-        <li>Know your community's evacuation routes and designated safe areas.</li>
-        <li>Follow weather updates and warnings from authorities.</li>
-        <li>Prepare an emergency bag with food, water, and first-aid supplies.</li>
-        <li>Evacuate early when advised to avoid danger.</li>
-        <li>Stay in safe shelters until officials declare it safe to return.</li>
+        <li>Do know your community's evacuation routes and nearest safe shelters.</li>
+        <li>Do follow weather advisories and warnings from official authorities.</li>
+        <li>Do prepare an emergency go-bag with food, water, medicines, flashlight, and important documents.</li>
+        <li>Do evacuate early when instructed, especially if you live in flood-prone or coastal areas.</li>
+        <li>Do assist children, elderly, pregnant women, and PWDs during evacuation.</li>
+        <li>Do turn off electricity and gas before leaving your home if advised.</li>
+        <li>Do stay inside evacuation centers until officials declare it safe to return.</li>
+        <li>Do keep calm and cooperate with local disaster response teams.</li>
+      </ul>
+      
+      <h4>Don'ts During Typhoon Evacuations:</h4>
+      <ul>
+        <li>Don't ignore typhoon warnings or evacuation orders.</li>
+        <li>Don't wait until flooding becomes severe before evacuating.</li>
+        <li>Don't cross flooded roads or rivers.</li>
+        <li>Don't bring too many belongings—prioritize safety and essentials.</li>
+        <li>Don't spread unverified information or rumors.</li>
+        <li>Don't return home early without clearance from authorities.</li>
+        <li>Don't stay in weak structures during strong winds and heavy rain.</li>
       </ul>
     `,
         quiz: [{

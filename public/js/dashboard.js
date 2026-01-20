@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadDashboard();
   setupFeatureCardListeners();
   setupAdminLogin();
+  setupLogout();
   setupTutorial();
 });
 
@@ -143,5 +144,19 @@ function setupAdminLogin() {
 
   adminBtn.addEventListener('click', () => {
     window.location.href = 'admin-login.html';
+  });
+}
+
+// Logout Button Function
+function setupLogout() {
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  logoutBtn.addEventListener('click', () => {
+    // Clear localStorage
+    localStorage.removeItem('y-safe-token');
+    localStorage.removeItem('y-safe-user');
+    
+    // Redirect to landing page
+    window.location.href = 'index.html';
   });
 }

@@ -94,9 +94,4 @@ function checkAuth() {
   return null;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const user = checkAuth();
-  if (user && window.location.pathname.endsWith('index.html') || user && window.location.pathname === '/') {
-    window.location.href = 'dashboard.html';
-  }
-});
+// Remove automatic redirect - allow users to see landing page
