@@ -12,9 +12,27 @@ const JWT_SECRET = process.env.JWT_SECRET || 'y-safe-secret-key-2026';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'your-password';
 const DATABASE_PATH = process.env.DATABASE_PATH || './database.sqlite';
 
+const DIST_DIR = path.join(__dirname, 'client', 'dist');
+
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('public'));
+
+// Legacy .html routes -> clean SPA routes (backward compatibility)
+const legacyRedirects = {
+  '/index.html': '/',
+  '/dashboard.html': '/dashboard',
+  '/first-aid.html': '/first-aid',
+  '/safety.html': '/safety',
+  '/essentials.html': '/essentials',
+  '/admin.html': '/admin',
+  '/admin-login.html': '/admin-login',
+};
+
+for (const [from, to] of Object.entries(legacyRedirects)) {
+  app.get(from, (req, res) => res.redirect(301, to));
+}
+
+app.use(express.static(DIST_DIR));
 
 const db = new sqlite3.Database(DATABASE_PATH, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
   if (err) {
@@ -340,6 +358,12 @@ app.get('/api/admin/stats', adminAuth, (req, res) => {
       });
     });
   });
+});
+
+// SPA fallback: serve index.html for any non-API GET route
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/') || req.path === '/health') return next();
+  res.sendFile(path.join(DIST_DIR, 'index.html'));
 });
 
 app.listen(PORT, () => {
